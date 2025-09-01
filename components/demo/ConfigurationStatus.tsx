@@ -26,7 +26,7 @@ export default function ConfigurationStatus({ onStatusChange }: ConfigurationSta
     setIsLoading(true);
     try {
       // Check if API endpoint responds
-      const response = await fetch('/api/copilotedge', {
+      const response = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 

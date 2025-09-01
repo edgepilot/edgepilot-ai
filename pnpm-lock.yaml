@@ -9,17 +9,23 @@ importers:
   .:
     dependencies:
       '@copilotkit/react-core':
-        specifier: ^1.10.1
-        version: 1.10.1(@types/react@19.1.9)(graphql@16.11.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        specifier: ^1.10.3
+        version: 1.10.3(@types/react@19.1.9)(graphql@16.11.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@copilotkit/react-textarea':
-        specifier: ^1.10.1
-        version: 1.10.1(@types/react-dom@19.1.7(@types/react@19.1.9))(@types/react@19.1.9)(graphql@16.11.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        specifier: ^1.10.3
+        version: 1.10.3(@types/react-dom@19.1.7(@types/react@19.1.9))(@types/react@19.1.9)(graphql@16.11.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@copilotkit/react-ui':
-        specifier: ^1.10.1
-        version: 1.10.1(@types/react@19.1.9)(graphql@16.11.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      copilotedge:
-        specifier: 0.3.0
-        version: 0.3.0(@types/react@19.1.9)(graphql@16.11.0)(next@15.4.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        specifier: ^1.10.3
+        version: 1.10.3(@types/react@19.1.9)(graphql@16.11.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@edgecraft/copilotkit-workers-ai':
+        specifier: file:../packages/edgecraft-workers-ai
+        version: file:../packages/edgecraft-workers-ai(next@15.4.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
+      '@tanstack/react-query':
+        specifier: ^5.85.6
+        version: 5.85.6(react@19.1.0)
+      '@tanstack/react-query-devtools':
+        specifier: ^5.85.6
+        version: 5.85.6(@tanstack/react-query@5.85.6(react@19.1.0))(react@19.1.0)
       next:
         specifier: 15.4.6
         version: 15.4.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -29,6 +35,9 @@ importers:
       react-dom:
         specifier: 19.1.0
         version: 19.1.0(react@19.1.0)
+      zustand:
+        specifier: ^5.0.8
+        version: 5.0.8(@types/react@19.1.9)(immer@9.0.21)(react@19.1.0)(use-sync-external-store@1.5.0(react@19.1.0))
     devDependencies:
       '@eslint/eslintrc':
         specifier: ^3
@@ -68,8 +77,8 @@ packages:
       graphql:
         optional: true
 
-  '@ag-ui/core@0.0.30':
-    resolution: {integrity: sha512-cBukbc2O0qMKi/BKix6Exld5zSqGKR72376KA6NZNQz/xYAiPNhmK40VX77d/hyblhtXT3BlBGrYmda9V4ETlw==}
+  '@ag-ui/core@0.0.36':
+    resolution: {integrity: sha512-uYUrzw6uxuw4qVQ61mdSeiG0mFh2n/VAWmWsWzwETDuhqJZT7rFmd07IajcFWcyItMr1wjqxFDdlklucAyEYNA==}
 
   '@alloc/quick-lru@5.2.0':
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
@@ -124,30 +133,39 @@ packages:
     resolution: {integrity: sha512-ruv7Ae4J5dUYULmeXw1gmb7rYRz57OWCPM57pHojnLq/3Z1CK2lNSLTCVjxVk1F/TZHwOZZrOWi0ur95BbLxNQ==}
     engines: {node: '>=6.9.0'}
 
-  '@copilotkit/react-core@1.10.1':
-    resolution: {integrity: sha512-MnIQMHsR7ooeuaDoAO2yDtPJGb3EYp5h0KkF3I8YAb2a5dah/KcbfYQ4Xcr9wfyc8GIp+aBC3L2C6UOdEYSUvg==}
+  '@copilotkit/react-core@1.10.3':
+    resolution: {integrity: sha512-m/R/cUENBlXP7+E7TUImVPqmgrHtMeYd3/qhOK3hQY4LqCtbEG5ju5HkEy/QbmVX5tNn/Wo8ti0kwK9tXX6lzA==}
     peerDependencies:
       react: ^18 || ^19 || ^19.0.0-rc
       react-dom: ^18 || ^19 || ^19.0.0-rc
 
-  '@copilotkit/react-textarea@1.10.1':
-    resolution: {integrity: sha512-YM8RWJFzeP9HzhesE0nJzOaP7e1ehJrFPj1yy7tA/M4Q64ym2ubsmHCWa0JiQ/S0tEC7rF8Tt68brESF3JZuEw==}
+  '@copilotkit/react-textarea@1.10.3':
+    resolution: {integrity: sha512-f4u7g6zU/Iw25+Q56+P1y4xY6plg0WwCLDpkdlUm8FjjTOnt/QOlPfsVnurpgIvOGo/OpfcnrpxZvs+HIUZjcw==}
     peerDependencies:
       react: ^18 || ^19 || ^19.0.0-rc
       react-dom: ^18 || ^19 || ^19.0.0-rc
 
-  '@copilotkit/react-ui@1.10.1':
-    resolution: {integrity: sha512-a9+PC0K3GKgmGOzItRm8xBsbf1sBKPpSCzvqdAwo2JP1FJ89A2Hkz47FGKxRTuDx0eXekzXIRAeZVHrGgmkBPA==}
+  '@copilotkit/react-ui@1.10.3':
+    resolution: {integrity: sha512-/MvKuVLor+372yKKs7Us3AmU2A/5+zWTE0Z0rEcMOxRNOPbjLt9zj5e86aJ0alz1hCspKG4UWCAGiphf+I19ig==}
     peerDependencies:
       react: ^18 || ^19 || ^19.0.0-rc
 
-  '@copilotkit/runtime-client-gql@1.10.1':
-    resolution: {integrity: sha512-AypscN1HB+oKdNrXZFNLKbL7owvlNsXMMzXNYDZGieqAUYM/p2/RmBF+uFPCJS+gZcR3xKv9Zda208mTrhaDWQ==}
+  '@copilotkit/runtime-client-gql@1.10.3':
+    resolution: {integrity: sha512-c0pmm9vyK1gy7hYP8F7Me97CpfxUY7OBdWvI2JQh7oll4abL3w5IbpKIEr/UNOGGJFdgz0NJE8eDOwnadQ51ww==}
     peerDependencies:
       react: ^18 || ^19 || ^19.0.0-rc
 
-  '@copilotkit/shared@1.10.1':
-    resolution: {integrity: sha512-b5DLcgF+K8Ecd5kweNLwO7uHx3H/K8CVflyKHL7zprxTaVyi+3NirxpDnUpFvrp/NiZw3NRVDSVnqsrorFGJyw==}
+  '@copilotkit/shared@1.10.3':
+    resolution: {integrity: sha512-LCgqfWfIfC97jCS6AMXVsuCXHK4CUqet7XXKJ9SB8gXR/kiDciP543gtoXznQK6L5ZP5FGDEH0KtPdNd/2Mcgg==}
+
+  '@edgecraft/copilotkit-workers-ai@file:../packages/edgecraft-workers-ai':
+    resolution: {directory: ../packages/edgecraft-workers-ai, type: directory}
+    engines: {node: '>=18'}
+    peerDependencies:
+      next: '>=13.4'
+    peerDependenciesMeta:
+      next:
+        optional: true
 
   '@emnapi/core@1.4.5':
     resolution: {integrity: sha512-XsLw1dEOpkSX/WucdqUhPWP7hDxSvZiY+fsUC14h+FtQ2Ifni4znbBt8punRX+Uj2JG/uDb8nEHVKvrVlvdZ5Q==}
@@ -1032,6 +1050,23 @@ packages:
   '@tailwindcss/postcss@4.1.11':
     resolution: {integrity: sha512-q/EAIIpF6WpLhKEuQSEVMZNMIY8KhWoAemZ9eylNAih9jxMGAYPPWBn3I9QL/2jZ+e7OEz/tZkX5HwbBR4HohA==}
 
+  '@tanstack/query-core@5.85.6':
+    resolution: {integrity: sha512-hCj0TktzdCv2bCepIdfwqVwUVWb+GSHm1Jnn8w+40lfhQ3m7lCO7ADRUJy+2unxQ/nzjh2ipC6ye69NDW3l73g==}
+
+  '@tanstack/query-devtools@5.84.0':
+    resolution: {integrity: sha512-fbF3n+z1rqhvd9EoGp5knHkv3p5B2Zml1yNRjh7sNXklngYI5RVIWUrUjZ1RIcEoscarUb0+bOvIs5x9dwzOXQ==}
+
+  '@tanstack/react-query-devtools@5.85.6':
+    resolution: {integrity: sha512-A6rE39FypFV7eonefk4fxC/vuV/7YJMAcQT94CFAvCpiw65QZX8MOuUpdLBeG1cXajy4Pj8T8sEWHigccntJqg==}
+    peerDependencies:
+      '@tanstack/react-query': ^5.85.6
+      react: ^18 || ^19
+
+  '@tanstack/react-query@5.85.6':
+    resolution: {integrity: sha512-VUAag4ERjh+qlmg0wNivQIVCZUrYndqYu3/wPCVZd4r0E+1IqotbeyGTc+ICroL/PqbpSaGZg02zSWYfcvxbdA==}
+    peerDependencies:
+      react: ^18 || ^19
+
   '@tanstack/react-virtual@3.13.12':
     resolution: {integrity: sha512-Gd13QdxPSukP8ZrkbgS2RwoZseTTbQPLnQEn7HY/rqtM+8Zt95f7xKC7N0EsKs7aoz0WzZ+fditZux+F8EzYxA==}
     peerDependencies:
@@ -1479,19 +1514,6 @@ packages:
 
   convert-source-map@1.9.0:
     resolution: {integrity: sha512-ASFBup0Mz1uyiIjANan1jzLQami9z1PoYSZCiiYW2FczPbenXc45FZdBZLzOT+r6+iciuEModtmCti+hjaAk0A==}
-
-  copilotedge@0.3.0:
-    resolution: {integrity: sha512-ZYf/IqQfSw+Hkz0GdF4gy03mDjYOaThaOo0N5Rxuqd88y66cEn5ry8Z9/aQcXYCW35ApA/SB8emnZHck+/Udbw==}
-    engines: {node: '>=18.0.0'}
-    peerDependencies:
-      next: '>=13.0.0'
-      react: ^18.0.0 || ^19.0.0
-      react-dom: ^18.0.0 || ^19.0.0
-    peerDependenciesMeta:
-      react:
-        optional: true
-      react-dom:
-        optional: true
 
   cosmiconfig@7.1.0:
     resolution: {integrity: sha512-AdmX6xUzdNASswsFtmwSt7Vj8po9IuqXm0UXz7QKPuEUmPB4XyjGfaAr2PSuELMwkRMVH1EpIkX5bTZGRB3eCA==}
@@ -3306,6 +3328,24 @@ packages:
   zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
 
+  zustand@5.0.8:
+    resolution: {integrity: sha512-gyPKpIaxY9XcO2vSMrLbiER7QMAMGOQZVRdJ6Zi782jkbzZygq5GI9nG8g+sMgitRtndwaBSl7uiqC49o1SSiw==}
+    engines: {node: '>=12.20.0'}
+    peerDependencies:
+      '@types/react': '>=18.0.0'
+      immer: '>=9.0.6'
+      react: '>=18.0.0'
+      use-sync-external-store: '>=1.2.0'
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      immer:
+        optional: true
+      react:
+        optional: true
+      use-sync-external-store:
+        optional: true
+
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
 
@@ -3315,7 +3355,7 @@ snapshots:
     optionalDependencies:
       graphql: 16.11.0
 
-  '@ag-ui/core@0.0.30':
+  '@ag-ui/core@0.0.36':
     dependencies:
       rxjs: 7.8.1
       zod: 3.25.76
@@ -3383,10 +3423,10 @@ snapshots:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.27.1
 
-  '@copilotkit/react-core@1.10.1(@types/react@19.1.9)(graphql@16.11.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+  '@copilotkit/react-core@1.10.3(@types/react@19.1.9)(graphql@16.11.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
-      '@copilotkit/runtime-client-gql': 1.10.1(graphql@16.11.0)(react@19.1.0)
-      '@copilotkit/shared': 1.10.1
+      '@copilotkit/runtime-client-gql': 1.10.3(graphql@16.11.0)(react@19.1.0)
+      '@copilotkit/shared': 1.10.3
       '@scarf/scarf': 1.4.0
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
@@ -3398,11 +3438,11 @@ snapshots:
       - graphql
       - supports-color
 
-  '@copilotkit/react-textarea@1.10.1(@types/react-dom@19.1.7(@types/react@19.1.9))(@types/react@19.1.9)(graphql@16.11.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+  '@copilotkit/react-textarea@1.10.3(@types/react-dom@19.1.7(@types/react@19.1.9))(@types/react@19.1.9)(graphql@16.11.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
-      '@copilotkit/react-core': 1.10.1(@types/react@19.1.9)(graphql@16.11.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@copilotkit/runtime-client-gql': 1.10.1(graphql@16.11.0)(react@19.1.0)
-      '@copilotkit/shared': 1.10.1
+      '@copilotkit/react-core': 1.10.3(@types/react@19.1.9)(graphql@16.11.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@copilotkit/runtime-client-gql': 1.10.3(graphql@16.11.0)(react@19.1.0)
+      '@copilotkit/shared': 1.10.3
       '@emotion/css': 11.13.5
       '@emotion/react': 11.14.0(@types/react@19.1.9)(react@19.1.0)
       '@emotion/styled': 11.14.1(@emotion/react@11.14.0(@types/react@19.1.9)(react@19.1.0))(@types/react@19.1.9)(react@19.1.0)
@@ -3430,11 +3470,11 @@ snapshots:
       - graphql
       - supports-color
 
-  '@copilotkit/react-ui@1.10.1(@types/react@19.1.9)(graphql@16.11.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+  '@copilotkit/react-ui@1.10.3(@types/react@19.1.9)(graphql@16.11.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
-      '@copilotkit/react-core': 1.10.1(@types/react@19.1.9)(graphql@16.11.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@copilotkit/runtime-client-gql': 1.10.1(graphql@16.11.0)(react@19.1.0)
-      '@copilotkit/shared': 1.10.1
+      '@copilotkit/react-core': 1.10.3(@types/react@19.1.9)(graphql@16.11.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@copilotkit/runtime-client-gql': 1.10.3(graphql@16.11.0)(react@19.1.0)
+      '@copilotkit/shared': 1.10.3
       '@headlessui/react': 2.2.7(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react: 19.1.0
       react-markdown: 10.1.0(@types/react@19.1.9)(react@19.1.0)
@@ -3449,9 +3489,9 @@ snapshots:
       - react-dom
       - supports-color
 
-  '@copilotkit/runtime-client-gql@1.10.1(graphql@16.11.0)(react@19.1.0)':
+  '@copilotkit/runtime-client-gql@1.10.3(graphql@16.11.0)(react@19.1.0)':
     dependencies:
-      '@copilotkit/shared': 1.10.1
+      '@copilotkit/shared': 1.10.3
       '@urql/core': 5.2.0(graphql@16.11.0)
       react: 19.1.0
       untruncate-json: 0.0.1
@@ -3460,9 +3500,9 @@ snapshots:
       - encoding
       - graphql
 
-  '@copilotkit/shared@1.10.1':
+  '@copilotkit/shared@1.10.3':
     dependencies:
-      '@ag-ui/core': 0.0.30
+      '@ag-ui/core': 0.0.36
       '@segment/analytics-node': 2.3.0
       chalk: 4.1.2
       graphql: 16.11.0
@@ -3471,6 +3511,10 @@ snapshots:
       zod-to-json-schema: 3.24.6(zod@3.25.76)
     transitivePeerDependencies:
       - encoding
+
+  '@edgecraft/copilotkit-workers-ai@file:../packages/edgecraft-workers-ai(next@15.4.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0))':
+    optionalDependencies:
+      next: 15.4.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
 
   '@emnapi/core@1.4.5':
     dependencies:
@@ -4346,6 +4390,21 @@ snapshots:
       postcss: 8.5.6
       tailwindcss: 4.1.11
 
+  '@tanstack/query-core@5.85.6': {}
+
+  '@tanstack/query-devtools@5.84.0': {}
+
+  '@tanstack/react-query-devtools@5.85.6(@tanstack/react-query@5.85.6(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      '@tanstack/query-devtools': 5.84.0
+      '@tanstack/react-query': 5.85.6(react@19.1.0)
+      react: 19.1.0
+
+  '@tanstack/react-query@5.85.6(react@19.1.0)':
+    dependencies:
+      '@tanstack/query-core': 5.85.6
+      react: 19.1.0
+
   '@tanstack/react-virtual@3.13.12(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
       '@tanstack/virtual-core': 3.13.12
@@ -4807,20 +4866,6 @@ snapshots:
   concat-map@0.0.1: {}
 
   convert-source-map@1.9.0: {}
-
-  copilotedge@0.3.0(@types/react@19.1.9)(graphql@16.11.0)(next@15.4.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
-    dependencies:
-      '@copilotkit/react-core': 1.10.1(@types/react@19.1.9)(graphql@16.11.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@copilotkit/react-ui': 1.10.1(@types/react@19.1.9)(graphql@16.11.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      next: 15.4.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-    optionalDependencies:
-      react: 19.1.0
-      react-dom: 19.1.0(react@19.1.0)
-    transitivePeerDependencies:
-      - '@types/react'
-      - encoding
-      - graphql
-      - supports-color
 
   cosmiconfig@7.1.0:
     dependencies:
@@ -7354,5 +7399,12 @@ snapshots:
       zod: 3.25.76
 
   zod@3.25.76: {}
+
+  zustand@5.0.8(@types/react@19.1.9)(immer@9.0.21)(react@19.1.0)(use-sync-external-store@1.5.0(react@19.1.0)):
+    optionalDependencies:
+      '@types/react': 19.1.9
+      immer: 9.0.21
+      react: 19.1.0
+      use-sync-external-store: 1.5.0(react@19.1.0)
 
   zwitch@2.0.4: {}

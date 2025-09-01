@@ -12,11 +12,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className="antialiased">
-        <CopilotKit runtimeUrl="/api/copilotedge">
+        <CopilotKit runtimeUrl="/api/ai/chat">
           {children}
           
           <CopilotPopup 
-            instructions={`You are a helpful AI assistant powered by CopilotEdge running on Cloudflare Workers AI.
+            instructions={`You are a helpful AI assistant powered by Edgecraft (CopilotKit + Cloudflare Workers AI).
 
 You can help users with:
 - Writing and editing content
@@ -27,8 +27,8 @@ You can help users with:
 Be concise, helpful, and friendly. When discussing technical topics, provide clear explanations with examples when appropriate.`}
             defaultOpen={false}
             labels={{
-              title: "🤖 CopilotEdge Assistant",
-              initial: "Hi! I'm powered by CopilotEdge and Cloudflare Workers AI. How can I help you today?",
+              title: "🤖 Edgecraft Assistant",
+              initial: "Hi! I'm powered by Edgecraft (CopilotKit + Cloudflare Workers AI). How can I help you today?",
               placeholder: "Ask me anything...",
             }}
           />

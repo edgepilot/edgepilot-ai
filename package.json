@@ -9,13 +9,16 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@copilotkit/react-core": "^1.10.1",
-    "@copilotkit/react-textarea": "^1.10.1",
-    "@copilotkit/react-ui": "^1.10.1",
-    "copilotedge": "0.3.0",
+    "@copilotkit/react-core": "^1.10.3",
+    "@copilotkit/react-textarea": "^1.10.3",
+    "@copilotkit/react-ui": "^1.10.3",
+    "@tanstack/react-query": "^5.85.6",
+    "@tanstack/react-query-devtools": "^5.85.6",
+    "@edgecraft/copilotkit-workers-ai": "file:../packages/edgecraft-workers-ai",
     "next": "15.4.6",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
