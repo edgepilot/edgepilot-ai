@@ -240,7 +240,7 @@ export const POST = createNextHandler({
           
           <div className="pt-8 border-t border-gray-800 flex items-center justify-between">
             <p className="text-gray-400 text-sm">
-              © 2024 CopilotEdge. All rights reserved.
+              © {new Date().getFullYear()} CopilotEdge. All rights reserved.
             </p>
             <div className="flex items-center space-x-4">
              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="text-gray-400 hover:text-white transition-colors">
