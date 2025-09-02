@@ -59,9 +59,11 @@ export default function StreamingChat() {
     try { window.localStorage.setItem('streamingChat.model', selectedModel); } catch {}
   }, [selectedModel]);
 
-  // Auto-scroll to bottom on updates if user is near bottom
+  // Auto-scroll the INTERNAL scroller (not the page) when near bottom
   useEffect(() => {
-    if (atBottom) endRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (!atBottom) return;
+    const el = scrollRef.current;
+    if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
   }, [reply, messages.length, status, atBottom]);
 
   // Track scroll position
@@ -311,7 +313,7 @@ export default function StreamingChat() {
       )}
       <div ref={scrollRef} onScroll={handleScroll} className="relative space-y-3 max-h-[50vh] overflow-y-auto pr-1">
         {messages.map((m, i) => (
-          <div key={i} className={`group relative rounded-lg border px-4 py-3 ${m.role === 'assistant' ? 'bg-gray-900/60 border-gray-800' : m.role === 'system' ? 'bg-gray-900/40 border-gray-800' : 'bg-black/40 border-gray-800'}`}>
+          <div key={`${m.role}|${(m as any).content?.length || 0}|${i}`} className={`group relative rounded-lg border px-4 py-3 ${m.role === 'assistant' ? 'bg-gray-900/60 border-gray-800' : m.role === 'system' ? 'bg-gray-900/40 border-gray-800' : 'bg-black/40 border-gray-800'}`}>
             <div className="text-xs uppercase tracking-wide mb-1 text-gray-400">{m.role}</div>
             <div className="text-gray-200">{renderContent(m.content)}</div>
             <button
@@ -338,7 +340,7 @@ export default function StreamingChat() {
         {!atBottom && (
           <button
             type="button"
-            onClick={() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }); setAtBottom(true); }}
+            onClick={() => { const el = scrollRef.current; if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' }); setAtBottom(true); }}
             className="absolute right-3 bottom-3 px-2.5 py-1 rounded-md border border-gray-700 bg-black/60 text-gray-200 text-xs hover:bg-white/5"
           >
             Jump to newest ↓

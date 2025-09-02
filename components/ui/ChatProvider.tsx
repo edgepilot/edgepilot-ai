@@ -2,21 +2,28 @@
 import React, { createContext, useContext, useMemo, useRef, useState, useEffect } from "react";
 import { useHomePageStore } from "../../stores/useHomePageStore";
 
-export type ChatMessage = { role: "system" | "user" | "assistant" | string; content: string };
+export type ChatMessage = { id?: string; role: "system" | "user" | "assistant" | string; content: string };
 
-type ChatContextType = {
+export type ChatContextType = {
   messages: ChatMessage[];
   setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>;
   open: boolean;
   setOpen: (v: boolean) => void;
   send: (input: string) => Promise<void>;
   loading: boolean;
+  inFlight: boolean;
   stop: () => void;
+  systemPrompt: string;
+  setSystemPrompt: React.Dispatch<React.SetStateAction<string>>;
+  temperature: number;
+  setTemperature: React.Dispatch<React.SetStateAction<number>>;
+  provider: 'cloudflare' | 'openai';
+  setProvider: React.Dispatch<React.SetStateAction<'cloudflare' | 'openai'>>;
 };
 
 const ChatContext = createContext<ChatContextType | null>(null);
 
-export function useChat() {
+export function useChat(): ChatContextType {
   const ctx = useContext(ChatContext);
   if (!ctx) throw new Error("useChat must be used inside <ChatProvider>");
   return ctx;
@@ -24,11 +31,12 @@ export function useChat() {
 
 export function ChatProvider({ children }: { children: React.ReactNode }) {
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: "system", content: "You are helpful." },
+    { id: `${Date.now()}-sys`, role: "system", content: "You are helpful." },
   ]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const controllerRef = useRef<AbortController | null>(null);
+  const streamIndexRef = useRef<number | null>(null);
   const { selectedModel } = useHomePageStore();
   // Default values to avoid SSR/CSR mismatch; hydrate from localStorage on mount
   const [provider, setProvider] = useState<'cloudflare'|'openai'>('cloudflare');
@@ -48,7 +56,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
   async function send(input: string) {
     if (!input.trim() || loading) return;
-    const user = { role: "user", content: input } as ChatMessage;
+    const user = { id: `${Date.now()}-user`, role: "user", content: input } as ChatMessage;
     const next = [...messages, user];
     setMessages(next);
     setLoading(true);
@@ -68,6 +76,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let buffer = "";
+      streamIndexRef.current = null;
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
@@ -84,19 +93,32 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
             const content = delta?.content || "";
             if (content) {
               reply += content;
-              // Optimistically reflect streaming in the view
+              // Update the same assistant message every chunk
               setMessages((prev) => {
-                const base = prev.filter((m) => m.role !== "assistant" || m.content !== "__streaming__");
-                return [...base, { role: "assistant", content: reply || "__streaming__" }];
+                const updated = [...prev];
+                if (streamIndexRef.current == null) {
+                  updated.push({ role: 'assistant', content: reply });
+                  streamIndexRef.current = updated.length - 1;
+                } else {
+                  const idx = streamIndexRef.current;
+                  if (updated[idx]) updated[idx] = { ...updated[idx], content: reply };
+                }
+                return updated;
               });
             }
           } catch {}
         }
       }
-      // Finalize assistant message
+      // Ensure the last assistant message reflects the final reply
       setMessages((prev) => {
-        const base = prev.filter((m, i) => !(i === prev.length - 1 && m.role === "assistant"));
-        return [...base, { role: "assistant", content: reply }];
+        const updated = [...prev];
+        const idx = streamIndexRef.current;
+        if (idx != null && updated[idx]) {
+          updated[idx] = { ...updated[idx], content: reply };
+          return updated;
+        }
+        updated.push({ role: 'assistant', content: reply });
+        return updated;
       });
     } catch (e) {
       // On error, append a small assistant notice
@@ -104,6 +126,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setLoading(false);
       controllerRef.current = null;
+      streamIndexRef.current = null;
     }
   }
 
@@ -114,6 +137,21 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => { try { localStorage.setItem('edgecraft.provider', provider); } catch {} }, [provider]);
   useEffect(() => { try { localStorage.setItem('edgecraft.systemPrompt', systemPrompt); } catch {} }, [systemPrompt]);
   useEffect(() => { try { localStorage.setItem('edgecraft.temperature', String(temperature)); } catch {} }, [temperature]);
-  const value = useMemo(() => ({ messages, setMessages, open, setOpen, send, loading, stop, systemPrompt, temperature, provider, setProvider, setSystemPrompt, setTemperature }), [messages, open, loading, systemPrompt, temperature, provider]);
+  const value = useMemo(() => ({
+    messages,
+    setMessages,
+    open,
+    setOpen,
+    send,
+    loading,
+    inFlight: loading,
+    stop,
+    systemPrompt,
+    temperature,
+    provider,
+    setProvider,
+    setSystemPrompt,
+    setTemperature,
+  }), [messages, open, loading, systemPrompt, temperature, provider]);
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
 }
