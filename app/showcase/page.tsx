@@ -4,29 +4,40 @@ export default function Page() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-md border-b border-gray-800">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-8">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-pink-500 rounded-lg" />
-                <span className="text-xl font-bold">Edgecraft</span>
+      {/* Skip link for keyboard users */}
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[60] focus:bg-white focus:text-black focus:px-3 focus:py-1 focus:rounded"
+      >
+        Skip to content
+      </a>
+
+      {/* Header / Navigation */}
+      <header className="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-md border-b border-gray-800">
+        <nav aria-label="Primary">
+          <div className="max-w-7xl mx-auto px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-8">
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-pink-500 rounded-lg" />
+                  <span className="text-xl font-bold">Edgecraft</span>
+                </div>
+                <div className="hidden md:flex items-center space-x-6">
+                  {/* TODO use links correctly*/}
+                </div>
               </div>
-              <div className="hidden md:flex items-center space-x-6">
-                {/* TODO use links correctly*/}
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-4">
      
-              <button className="px-4 py-2 bg-white text-black font-medium rounded-lg hover:bg-gray-200 transition-colors">
-                Get Started
-              </button>
+                <button className="px-4 py-2 bg-white text-black font-medium rounded-lg hover:bg-gray-200 transition-colors">
+                  Get Started
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+      </header>
 
+      <main id="main" tabIndex={-1}>
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 px-6 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-red-600/20 via-transparent to-pink-600/20 opacity-50" />
@@ -155,10 +166,11 @@ export const POST = createNextHandler({
           </div>
         </div>
       </section>
+      </main>
 
 
       {/* Footer */}
-      <footer className="border-t border-gray-800 py-12 px-6">
+      <footer className="border-t border-gray-800 py-12 px-6" role="contentinfo">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
