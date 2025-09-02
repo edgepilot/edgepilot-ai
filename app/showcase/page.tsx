@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 
 export default function Page() {
 
@@ -22,9 +23,27 @@ export default function Page() {
                   <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-pink-500 rounded-lg" />
                   <span className="text-xl font-bold">Edgecraft</span>
                 </div>
-                <div className="hidden md:flex items-center space-x-6">
-                  {/* TODO use links correctly*/}
-                </div>
+                <ul className="hidden md:flex items-center gap-6" role="list">
+                  <li>
+                    <Link href="/" className="text-gray-300 hover:text-white transition-colors">
+                      Home
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/showcase"
+                      aria-current="page"
+                      className="text-white font-medium border-b border-white/60"
+                    >
+                      Showcase
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/#features" className="text-gray-300 hover:text-white transition-colors">
+                      Features
+                    </Link>
+                  </li>
+                </ul>
               </div>
               <div className="flex items-center space-x-4">
      
