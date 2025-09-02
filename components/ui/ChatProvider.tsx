@@ -67,16 +67,22 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
   async function send(input: string) {
     if (!input.trim() || loading) return;
-    const user = { id: newId('usr'), role: "user", content: input } as ChatMessage;
-    const next = [...messages, user];
-    setMessages(next);
     setLoading(true);
     const controller = new AbortController();
     controllerRef.current = controller;
+    let outMessages: ChatMessage[] = [];
+    // Commit the user message and capture the exact snapshot we will send
+    setMessages((prev) => {
+      const user = { id: newId('usr'), role: 'user', content: input } as ChatMessage;
+      const base = prev[0]?.role === 'system'
+        ? [{ ...prev[0], content: systemPrompt }, ...prev.slice(1)]
+        : [{ id: newId('sys'), role: 'system', content: systemPrompt }, ...prev];
+      outMessages = [...base, user];
+      return [...prev, user];
+    });
     let reply = "";
     try {
       // Build messages with current system prompt
-      const outMessages = next.map((m, i) => (i === 0 && m.role === 'system') ? { ...m, content: systemPrompt } : m);
       const res = await fetch("/api/ai/chat", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -88,6 +94,24 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       const decoder = new TextDecoder();
       let buffer = "";
       streamIndexRef.current = null;
+      let raf = 0;
+      const scheduleUpdate = () => {
+        if (raf) return;
+        raf = requestAnimationFrame(() => {
+          raf = 0;
+          setMessages((prev) => {
+            const updated = [...prev];
+            const idx = streamIndexRef.current;
+            if (idx == null) {
+              updated.push({ id: newId('asst'), role: 'assistant', content: reply });
+              streamIndexRef.current = updated.length - 1;
+            } else if (updated[idx]) {
+              updated[idx] = { ...updated[idx], content: reply };
+            }
+            return updated;
+          });
+        });
+      };
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
@@ -118,17 +142,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
             }
             if (contentChunk) {
               reply += contentChunk;
-              setMessages((prev) => {
-                const updated = [...prev];
-                const idx = streamIndexRef.current;
-                if (idx == null) {
-                  updated.push({ id: newId('asst'), role: 'assistant', content: reply });
-                  streamIndexRef.current = updated.length - 1;
-                } else if (updated[idx]) {
-                  updated[idx] = { ...updated[idx], content: reply };
-                }
-                return updated;
-              });
+              scheduleUpdate();
             }
           } catch {}
         }
