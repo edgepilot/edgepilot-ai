@@ -4,6 +4,7 @@ import { useHomePageStore } from "../../stores/useHomePageStore";
 import ModelSelector from "./ModelSelector";
 
 type Msg = { role: "system" | "user" | "assistant" | string; content: string };
+type StreamStatus = "idle" | "pending" | "connecting" | "streaming" | "done" | "aborted" | "error";
 
 export default function StreamingChat() {
   const [input, setInput] = useState("");
@@ -12,9 +13,7 @@ export default function StreamingChat() {
   ]);
   const [reply, setReply] = useState("");
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState<
-    "idle" | "pending" | "connecting" | "streaming" | "done" | "aborted" | "error"
-  >("idle");
+  const [status, setStatus] = useState<StreamStatus>("idle");
   const [ttft, setTtft] = useState<number | null>(null);
   const [elapsed, setElapsed] = useState<number | null>(null);
   const [charCount, setCharCount] = useState(0);
@@ -215,7 +214,7 @@ export default function StreamingChat() {
       setStatus('idle');
       return;
     }
-    setStatus('pending' as any);
+    setStatus('pending');
     sendDebounceRef.current = window.setTimeout(async () => {
       sendDebounceRef.current = null;
       await sendNow();
@@ -274,7 +273,7 @@ export default function StreamingChat() {
         <div className="flex items-center gap-2 font-medium">
           <span className="text-gray-400">Status:</span>
           <span className={`px-2 py-0.5 rounded-full text-black ${
-            (status as any) === 'streaming' ? 'bg-green-300' :
+            status === 'streaming' ? 'bg-green-300' :
             status === 'connecting' ? 'bg-yellow-300' :
             status === 'done' ? 'bg-blue-300' :
             status === 'aborted' ? 'bg-rose-300' :
@@ -282,7 +281,7 @@ export default function StreamingChat() {
           }`}>
             {status}
           </span>
-          {(status === 'connecting' || (status as any) === 'streaming' || (status as any) === 'pending') && <span aria-hidden>⏳</span>}
+          {(status === 'connecting' || status === 'streaming' || status === 'pending') && <span aria-hidden>⏳</span>}
         </div>
         <div className="hidden sm:block">|</div>
         <div><b>Model:</b> {modelName || '-'}</div>
@@ -318,7 +317,7 @@ export default function StreamingChat() {
       )}
       <div ref={scrollRef} onScroll={handleScroll} className="relative space-y-3 max-h-[50vh] overflow-y-auto pr-1">
         {messages.map((m, i) => (
-          <div key={`${m.role}|${(m as any).content?.length || 0}|${i}`} className={`group relative rounded-lg border px-4 py-3 ${m.role === 'assistant' ? 'bg-gray-900/60 border-gray-800' : m.role === 'system' ? 'bg-gray-900/40 border-gray-800' : 'bg-black/40 border-gray-800'}`}>
+          <div key={`${m.role}|${m.content.length || 0}|${i}`} className={`group relative rounded-lg border px-4 py-3 ${m.role === 'assistant' ? 'bg-gray-900/60 border-gray-800' : m.role === 'system' ? 'bg-gray-900/40 border-gray-800' : 'bg-black/40 border-gray-800'}`}>
             <div className="text-xs uppercase tracking-wide mb-1 text-gray-400">{m.role}</div>
             <div className="text-gray-200">{renderContent(m.content)}</div>
             <button
