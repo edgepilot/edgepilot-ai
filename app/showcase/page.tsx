@@ -1,4 +1,5 @@
 import React from 'react';
+import CopyButton from '../../components/ui/CopyButton';
 import Link from 'next/link';
 
 export default function Page() {
@@ -87,11 +88,19 @@ export default function Page() {
           {/* Code Preview */}
           <div className="mt-20 max-w-4xl mx-auto">
             <div className="bg-gray-900 rounded-lg border border-gray-800 overflow-hidden">
-              <div className="flex items-center space-x-2 px-4 py-3 border-b border-gray-800">
-                <div className="w-3 h-3 bg-red-500 rounded-full" />
-                <div className="w-3 h-3 bg-yellow-500 rounded-full" />
-                <div className="w-3 h-3 bg-green-500 rounded-full" />
-                <span className="ml-4 text-xs text-gray-500">api/ai/chat/route.ts</span>
+              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800">
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-red-500 rounded-full" />
+                  <div className="w-3 h-3 bg-yellow-500 rounded-full" />
+                  <div className="w-3 h-3 bg-green-500 rounded-full" />
+                  <span className="ml-4 text-xs text-gray-500">api/ai/chat/route.ts</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-gray-500">TypeScript</span>
+                  <CopyButton
+                    text={`import { createNextHandler } from '@edgecraft/copilotkit-workers-ai';\n\nexport const runtime = 'edge';\n\nexport const POST = createNextHandler({\n  apiKey: process.env.CLOUDFLARE_API_TOKEN,\n  accountId: process.env.CLOUDFLARE_ACCOUNT_ID,\n  model: '@cf/meta/llama-3.1-70b-instruct',\n  stream: true,\n  cache: false,\n});`}
+                  />
+                </div>
               </div>
               <pre className="p-6 text-sm overflow-x-auto">
                 <code className="language-typescript text-gray-300">
