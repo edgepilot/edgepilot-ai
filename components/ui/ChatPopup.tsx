@@ -17,6 +17,16 @@ export default function ChatPopup() {
   const shouldStickToBottom = useRef(true);
   const PAGE_SIZE = 200;
   const [visibleCount, setVisibleCount] = useState<number>(PAGE_SIZE);
+  const [emptyNotice, setEmptyNotice] = useState<string | null>(null);
+  const emptyTimerRef = useRef<number | null>(null);
+
+  function showEmptyNotice() {
+    setEmptyNotice('Type something first');
+    if (emptyTimerRef.current) window.clearTimeout(emptyTimerRef.current);
+    emptyTimerRef.current = window.setTimeout(() => setEmptyNotice(null), 1200);
+    // Nudge focus back to the textarea
+    requestAnimationFrame(() => inputRef.current?.focus());
+  }
 
   useEffect(() => {
     if (!open) return;
@@ -101,6 +111,7 @@ export default function ChatPopup() {
         onClick={() => setOpen(!open)}
         className="fixed right-4 bottom-4 z-30 h-12 w-12 rounded-full bg-white text-black shadow-lg hover:shadow-xl focus:outline-none"
         aria-label={open ? "Close chat" : "Open chat"}
+        title={open ? "Close chat" : "Open chat"}
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-controls={open ? dialogId : undefined}
@@ -117,6 +128,7 @@ export default function ChatPopup() {
             role="dialog"
             aria-modal="true"
             aria-labelledby={labelId}
+            aria-describedby={inputHintId}
             id={dialogId}
             ref={dialogRef}
             tabIndex={-1}
@@ -247,6 +259,8 @@ export default function ChatPopup() {
                     inputRef.current.style.height = '0px';
                     inputRef.current.style.height = inputRef.current.scrollHeight + 'px';
                   }
+                } else {
+                  showEmptyNotice();
                 }
               }}
             >
@@ -268,6 +282,8 @@ export default function ChatPopup() {
                         inputRef.current.style.height = '0px';
                         inputRef.current.style.height = inputRef.current.scrollHeight + 'px';
                       }
+                    } else {
+                      showEmptyNotice();
                     }
                   }
                 }}
@@ -276,6 +292,11 @@ export default function ChatPopup() {
               <p id={inputHintId} className="sr-only">Press Enter or Ctrl/Cmd+Enter to send. Shift+Enter inserts a newline.</p>
               <button disabled={loading} className="px-3 py-2 rounded-md bg-white text-black text-sm disabled:opacity-40">Send</button>
             </form>
+            {emptyNotice && (
+              <div aria-live="polite" className="px-3 pb-3 -mt-2 text-xs text-rose-300">
+                {emptyNotice}
+              </div>
+            )}
           </div>
         </div>
       )}
