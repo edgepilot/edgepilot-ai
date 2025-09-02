@@ -31,8 +31,17 @@ export function useChat(): ChatContextType {
 }
 
 export function ChatProvider({ children }: { children: React.ReactNode }) {
+  function newId(prefix: string): string {
+    try {
+      // Prefer crypto for strong uniqueness when available
+      return `${prefix}-${(globalThis as any).crypto?.randomUUID?.() || ''}` || `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+    } catch {
+      return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+    }
+  }
+
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { id: `${Date.now()}-sys`, role: "system", content: "You are helpful." },
+    { id: newId('sys'), role: "system", content: "You are helpful." },
   ]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -57,7 +66,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
   async function send(input: string) {
     if (!input.trim() || loading) return;
-    const user = { id: `${Date.now()}-user`, role: "user", content: input } as ChatMessage;
+    const user = { id: newId('usr'), role: "user", content: input } as ChatMessage;
     const next = [...messages, user];
     setMessages(next);
     setLoading(true);
@@ -98,7 +107,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
               setMessages((prev) => {
                 const updated = [...prev];
                 if (streamIndexRef.current == null) {
-                  updated.push({ role: 'assistant', content: reply });
+                  updated.push({ id: newId('asst'), role: 'assistant', content: reply });
                   streamIndexRef.current = updated.length - 1;
                 } else {
                   const idx = streamIndexRef.current;
@@ -118,12 +127,12 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
           updated[idx] = { ...updated[idx], content: reply };
           return updated;
         }
-        updated.push({ role: 'assistant', content: reply });
+        updated.push({ id: newId('asst'), role: 'assistant', content: reply });
         return updated;
       });
     } catch (e) {
       // On error, append a small assistant notice
-      setMessages((prev) => [...prev, { role: "assistant", content: "(request failed)" }]);
+      setMessages((prev) => [...prev, { id: newId('asst'), role: "assistant", content: "(request failed)" }]);
     } finally {
       setLoading(false);
       controllerRef.current = null;
