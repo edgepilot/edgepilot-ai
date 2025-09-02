@@ -3,6 +3,7 @@ import React, { createContext, useContext, useMemo, useRef, useState, useEffect 
 import { useHomePageStore } from "../../stores/useHomePageStore";
 
 export type ChatMessage = { id?: string; role: "system" | "user" | "assistant" | string; content: string };
+export type ProviderName = 'cloudflare' | 'openai';
 
 export type ChatContextType = {
   messages: ChatMessage[];
@@ -17,8 +18,8 @@ export type ChatContextType = {
   setSystemPrompt: React.Dispatch<React.SetStateAction<string>>;
   temperature: number;
   setTemperature: React.Dispatch<React.SetStateAction<number>>;
-  provider: 'cloudflare' | 'openai';
-  setProvider: React.Dispatch<React.SetStateAction<'cloudflare' | 'openai'>>;
+  provider: ProviderName;
+  setProvider: React.Dispatch<React.SetStateAction<ProviderName>>;
 };
 
 const ChatContext = createContext<ChatContextType | null>(null);
@@ -39,12 +40,12 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   const streamIndexRef = useRef<number | null>(null);
   const { selectedModel } = useHomePageStore();
   // Default values to avoid SSR/CSR mismatch; hydrate from localStorage on mount
-  const [provider, setProvider] = useState<'cloudflare'|'openai'>('cloudflare');
+  const [provider, setProvider] = useState<ProviderName>('cloudflare');
   const [systemPrompt, setSystemPrompt] = useState<string>('You are helpful.');
   const [temperature, setTemperature] = useState<number>(0.7);
   useEffect(() => {
     try {
-      const savedProvider = localStorage.getItem('edgecraft.provider') as any;
+      const savedProvider = localStorage.getItem('edgecraft.provider') as ProviderName | null;
       if (savedProvider === 'openai' || savedProvider === 'cloudflare') setProvider(savedProvider);
       const savedPrompt = localStorage.getItem('edgecraft.systemPrompt');
       if (typeof savedPrompt === 'string' && savedPrompt.length) setSystemPrompt(savedPrompt);
