@@ -305,8 +305,12 @@ export default function StreamingChat() {
         <div className="hidden sm:block">|</div>
         <div><b>Chars:</b> {charCount}</div>
         <div className="hidden sm:block">|</div>
-        <div><b>Throughput:</b> {ttft !== null && elapsed !== null && elapsed > ttft
-          ? `${(charCount / ((elapsed - ttft) / 1000)).toFixed(1)} ch/s` : '-'}</div>
+        {(() => {
+          const showThroughput = status === 'done' && ttft !== null && elapsed !== null && elapsed > ttft;
+          return (
+            <div><b>Throughput:</b> {showThroughput ? `${(charCount / ((elapsed - ttft) / 1000)).toFixed(1)} ch/s` : '-'}</div>
+          );
+        })()}
         <div className="ml-auto flex items-center gap-2">
           {(status === 'connecting' || status === 'streaming') && (
             <button onClick={abort} className="px-2.5 py-1 rounded-md border border-rose-500/40 text-rose-300 hover:bg-rose-500/10">Stop</button>
