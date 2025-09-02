@@ -3,8 +3,10 @@ import { useEffect, useRef, useState } from "react";
 import { useHomePageStore } from "../../stores/useHomePageStore";
 import ModelSelector from "./ModelSelector";
 
-type Msg = { role: "system" | "user" | "assistant" | string; content: string };
+type Msg = { id?: string; role: "system" | "user" | "assistant" | string; content: string };
 const MAX_HISTORY = 200;
+
+const makeId = () => Math.random().toString(36).slice(2, 10);
 
 function windowedPush(setter: React.Dispatch<React.SetStateAction<Msg[]>>, m: Msg) {
   setter((prev) => {
@@ -17,7 +19,7 @@ type StreamStatus = "idle" | "pending" | "connecting" | "streaming" | "done" | "
 export default function StreamingChat() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Msg[]>([
-    { role: "system", content: "You are helpful." },
+    { id: makeId(), role: "system", content: "You are helpful." },
   ]);
   const [reply, setReply] = useState("");
   const [loading, setLoading] = useState(false);
@@ -117,7 +119,7 @@ export default function StreamingChat() {
 
   async function sendNow() {
     if (loading || aborter) return; // prevent re-entrancy
-    const userMsg: Msg = { role: "user", content: input };
+    const userMsg: Msg = { id: makeId(), role: "user", content: input };
     const toSend = [...messages, userMsg];
     windowedPush(setMessages, userMsg);
     setInput("");
@@ -206,7 +208,7 @@ export default function StreamingChat() {
       const end = performance.now();
       setElapsed(end - start);
       if (accumulated) {
-        windowedPush(setMessages, { role: "assistant", content: accumulated });
+        windowedPush(setMessages, { id: makeId(), role: "assistant", content: accumulated });
       }
       try { await reader.cancel(); } catch {}
     }
@@ -326,7 +328,7 @@ export default function StreamingChat() {
       )}
       <div ref={scrollRef} onScroll={handleScroll} className="relative space-y-3 max-h-[50vh] overflow-y-auto pr-1">
         {messages.map((m, i) => (
-          <div key={`${m.role}|${m.content.length || 0}|${i}`} className={`group relative rounded-lg border px-4 py-3 ${m.role === 'assistant' ? 'bg-gray-900/60 border-gray-800' : m.role === 'system' ? 'bg-gray-900/40 border-gray-800' : 'bg-black/40 border-gray-800'}`}>
+          <div key={m.id || `${m.role}|${m.content.length || 0}|${i}`} className={`group relative rounded-lg border px-4 py-3 ${m.role === 'assistant' ? 'bg-gray-900/60 border-gray-800' : m.role === 'system' ? 'bg-gray-900/40 border-gray-800' : 'bg-black/40 border-gray-800'}`}>
             <div className="text-xs uppercase tracking-wide mb-1 text-gray-400">{m.role}</div>
             <div className="text-gray-200">{renderContent(m.content)}</div>
             <button
