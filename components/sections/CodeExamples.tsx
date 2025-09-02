@@ -1,5 +1,6 @@
 "use client";
-import React, { useState } from 'react';
+import React from 'react';
+import CopyButton from '../ui/CopyButton';
 
 interface CodeExample {
   title: string;
@@ -36,16 +37,6 @@ export function CodeExamples({
   nextStepsTitle = "Ready to Build?",
   nextStepsSubtitle = "You now have everything you need to create AI-powered applications"
 }: CodeExamplesProps) {
-  const [copied, setCopied] = useState<number | null>(null);
-
-  async function copy(code: string, idx: number) {
-    try {
-      await navigator.clipboard.writeText(code);
-      setCopied(idx);
-      window.setTimeout(() => setCopied((c) => (c === idx ? null : c)), 1200);
-    } catch {}
-  }
-
   return (
     <>
       <section id="code" className="py-20 px-6 border-t border-gray-800">
@@ -69,17 +60,13 @@ export function CodeExamples({
                           <span className="ml-4 text-xs text-gray-500">{example.fileName}</span>
                         )}
                       </div>
-                      <button
-                        onClick={() => copy(example.code, index)}
-                        className="text-xs px-2 py-1 rounded-md border border-gray-700 text-gray-300 hover:bg-white/5"
-                        aria-label="Copy code"
-                        title={copied === index ? 'Copied' : 'Copy code'}
-                      >
-                        {copied === index ? 'Copied' : 'Copy'}
-                      </button>
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs text-gray-500">TypeScript</span>
+                        <CopyButton text={example.code} />
+                      </div>
                     </div>
                   )}
-                  <pre className="p-6 text-sm overflow-x-auto">
+                  <pre className="p-6 text-sm overflow-x-auto" aria-label="TypeScript example">
                     <code className="text-gray-300">{example.code}</code>
                   </pre>
                 </div>
