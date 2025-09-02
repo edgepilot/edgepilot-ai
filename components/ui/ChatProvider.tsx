@@ -33,11 +33,12 @@ export function useChat(): ChatContextType {
 export function ChatProvider({ children }: { children: React.ReactNode }) {
   function newId(prefix: string): string {
     try {
-      // Prefer crypto for strong uniqueness when available
-      return `${prefix}-${(globalThis as any).crypto?.randomUUID?.() || ''}` || `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
-    } catch {
-      return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
-    }
+      const uuid = (globalThis as any).crypto?.randomUUID?.();
+      if (uuid) return `${prefix}-${uuid}`;
+    } catch {}
+    const t = Date.now().toString(36);
+    const rnd = Math.random().toString(36).slice(2, 10);
+    return `${prefix}-${t}-${rnd}`;
   }
 
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -130,9 +131,11 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         updated.push({ id: newId('asst'), role: 'assistant', content: reply });
         return updated;
       });
-    } catch (e) {
-      // On error, append a small assistant notice
-      setMessages((prev) => [...prev, { id: newId('asst'), role: "assistant", content: "(request failed)" }]);
+    } catch (e: any) {
+      // Only append failure if not a user-initiated abort
+      if (!(e?.name === 'AbortError' || controller.signal.aborted)) {
+        setMessages((prev) => [...prev, { id: newId('asst'), role: "assistant", content: "(request failed)" }]);
+      }
     } finally {
       setLoading(false);
       controllerRef.current = null;
