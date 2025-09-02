@@ -156,17 +156,17 @@ export default function StreamingChat() {
         const { done, value } = await reader.read();
         if (done) break;
         buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split("\n");
-        buffer = lines.pop() || "";
+        const lines = buffer.replace(/\r/g, '').split("\n");
+        buffer = lines.pop() ?? "";
         for (const line of lines) {
-          if (!line.startsWith("data: ")) continue;
-          const data = line.slice(6).trim();
-          if (data === "[DONE]") continue;
+          if (!line.startsWith("data:")) continue;
+          const data = line.slice(5).trim();
+          if (!data || data === "[DONE]") continue;
           try {
             const json = JSON.parse(data);
             if (!modelName && json.model) setModelName(json.model);
-            const delta = json.choices?.[0]?.delta;
-            const content = delta?.content || "";
+            const delta = json.choices?.[0]?.delta ?? {};
+            const content = delta.content || "";
             if (content) {
               if (ttft === null) {
                 setTtft(performance.now() - start);
