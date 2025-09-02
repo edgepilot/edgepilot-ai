@@ -34,7 +34,7 @@ export default function Page() {
           <div className="text-center max-w-4xl mx-auto">
             <div className="inline-flex items-center space-x-2 px-3 py-1 bg-gray-800/50 rounded-full border border-gray-700 mb-8">
               <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              <span className="text-sm text-gray-300">CopilotKit + Cloudflare Workers AI</span>
+              <span className="text-sm text-gray-300">Edgecraft + Cloudflare Workers AI</span>
             </div>
             <h1 className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-br from-white to-gray-400 bg-clip-text text-transparent">
               The AI copilot
@@ -42,7 +42,7 @@ export default function Page() {
               for your app
             </h1>
             <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
-              Build intelligent applications with Edgecraft (CopilotKit + Cloudflare Workers AI),
+              Build intelligent applications with Edgecraft’s local components + Cloudflare Workers AI,
               delivering fast, scalable AI experiences at the edge.
             </p>
             <div className="flex items-center justify-center space-x-4">

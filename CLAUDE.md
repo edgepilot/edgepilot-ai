@@ -18,16 +18,16 @@ pnpm add [pkg]    # Add new dependency
 
 ## Architecture Overview
 
-This is a Next.js 15.4.6 application with React 19.1.0 that integrates CopilotKit with Cloudflare Workers AI via the CopilotEdge package.
+This is a Next.js 15.4.6 application with React 19.1.0 that integrates custom local chat components with Cloudflare Workers AI via the CopilotEdge package.
 
 ### Core Integration Flow
-1. **Frontend**: CopilotKit components (`@copilotkit/react-core`, `@copilotkit/react-ui`) handle UI interactions
-2. **API Route**: `/api/copilotedge/route.ts` uses `createCopilotEdgeHandler` from `copilotedge` package
+1. **Frontend**: Local components (`ChatProvider`, `ChatPopup`, `EdgeTextarea`) handle UI interactions
+2. **API Route**: `/api/ai/chat/route.ts` uses `createNextHandler` from `@edgecraft/copilotkit-workers-ai`
 3. **Backend**: Routes requests to Cloudflare Workers AI models
 
 ### Key Files
-- `app/api/copilotedge/route.ts` - Main API handler for AI requests
-- `app/layout.tsx` - Wraps app with CopilotKit provider and includes CopilotPopup
+- `app/api/ai/chat/route.ts` - Main API handler for AI requests
+- `app/layout.tsx` - Wraps app with ChatProvider and includes ChatPopup
 - `app/page.tsx` - Main demo page with model selector and interactive examples
 
 ### Environment Configuration

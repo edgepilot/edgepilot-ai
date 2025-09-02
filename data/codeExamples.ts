@@ -26,31 +26,20 @@ export const POST = createNextHandler({
   },
   {
     title: "2. Setup Your Layout",
-    description: "Wrap your app with CopilotKit in app/layout.tsx:",
+    description: "Wrap your app with the local ChatProvider and include ChatPopup in app/layout.tsx:",
     fileName: "layout.tsx",
-    code: `import { CopilotKit } from '@copilotkit/react-core';
-import { CopilotPopup } from '@copilotkit/react-ui';
-import '@copilotkit/react-ui/styles.css';
+    code: `import { ChatProvider } from '../components/ui/ChatProvider';
+import ChatPopup from '../components/ui/ChatPopup';
+import './globals.css';
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>
-        <CopilotKit runtimeUrl="/api/ai/chat">
+      <body className="antialiased">
+        <ChatProvider>
           {children}
-          <CopilotPopup 
-            instructions="You are a helpful AI assistant."
-            defaultOpen={false}
-            labels={{
-              title: "AI Assistant",
-              initial: "Hi! How can I help you today?"
-            }}
-          />
-        </CopilotKit>
+          <ChatPopup />
+        </ChatProvider>
       </body>
     </html>
   );
@@ -58,45 +47,19 @@ export default function RootLayout({
   },
   {
     title: "3. Use AI Components",
-    description: "Add AI-powered features to your components:",
+    description: "Use the local EdgeTextarea with built-in Cmd/Ctrl+K suggestions:",
     fileName: "MyComponent.tsx",
-    code: `import { CopilotTextarea } from '@copilotkit/react-textarea';
-import { useCopilotAction } from '@copilotkit/react-core';
+    code: `import { useState } from 'react';
+import EdgeTextarea from '../components/ui/EdgeTextarea';
 
 export function MyComponent() {
   const [text, setText] = useState('');
-
-  // Register a custom action
-  useCopilotAction({
-    name: "generateIdeas",
-    description: "Generate creative ideas",
-    parameters: [
-      {
-        name: "topic",
-        type: "string",
-        description: "The topic to generate ideas for",
-        required: true,
-      }
-    ],
-    handler: async ({ topic }) => {
-      // Your custom logic here
-      return \`Generated ideas for: \${topic}\`;
-    },
-  });
-
   return (
-    <CopilotTextarea
+    <EdgeTextarea
       value={text}
-      onValueChange={setText}
-      placeholder="Type here..."
-      autosuggestionsConfig={{
-        textareaPurpose: "Creative writing",
-        chatApiConfigs: {
-          suggestionsApiConfig: {
-            model: "@cf/meta/llama-3.1-70b-instruct"
-          }
-        }
-      }}
+      onChange={setText}
+      placeholder="Type here... (Cmd/Ctrl+K for a suggestion)"
+      className="w-full min-h-32 rounded-md border border-gray-700 bg-black/50 text-gray-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600"
     />
   );
 }`

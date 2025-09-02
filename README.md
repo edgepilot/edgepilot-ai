@@ -198,4 +198,4 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-**Built with ❤️ using CopilotEdge, CopilotKit, and Cloudflare Workers AI**
+**Built with ❤️ using CopilotEdge and Cloudflare Workers AI**
