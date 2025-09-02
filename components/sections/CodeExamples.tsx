@@ -1,4 +1,5 @@
-import React from 'react';
+"use client";
+import React, { useState } from 'react';
 
 interface CodeExample {
   title: string;
@@ -35,6 +36,16 @@ export function CodeExamples({
   nextStepsTitle = "Ready to Build?",
   nextStepsSubtitle = "You now have everything you need to create AI-powered applications"
 }: CodeExamplesProps) {
+  const [copied, setCopied] = useState<number | null>(null);
+
+  async function copy(code: string, idx: number) {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopied(idx);
+      window.setTimeout(() => setCopied((c) => (c === idx ? null : c)), 1200);
+    } catch {}
+  }
+
   return (
     <>
       <section id="code" className="py-20 px-6 border-t border-gray-800">
@@ -48,12 +59,24 @@ export function CodeExamples({
                 <h3 className="text-2xl font-semibold mb-4">{example.title}</h3>
                 <p className="text-gray-400 mb-4">{example.description}</p>
                 <div className="bg-gray-900 rounded-lg border border-gray-800 overflow-hidden">
-                  {example.fileName && (
-                    <div className="flex items-center space-x-2 px-4 py-3 border-b border-gray-800">
-                      <div className="w-3 h-3 bg-red-500 rounded-full" />
-                      <div className="w-3 h-3 bg-yellow-500 rounded-full" />
-                      <div className="w-3 h-3 bg-green-500 rounded-full" />
-                      <span className="ml-4 text-xs text-gray-500">{example.fileName}</span>
+                  {(example.fileName || true) && (
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-3 h-3 bg-red-500 rounded-full" />
+                        <div className="w-3 h-3 bg-yellow-500 rounded-full" />
+                        <div className="w-3 h-3 bg-green-500 rounded-full" />
+                        {example.fileName && (
+                          <span className="ml-4 text-xs text-gray-500">{example.fileName}</span>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => copy(example.code, index)}
+                        className="text-xs px-2 py-1 rounded-md border border-gray-700 text-gray-300 hover:bg-white/5"
+                        aria-label="Copy code"
+                        title={copied === index ? 'Copied' : 'Copy code'}
+                      >
+                        {copied === index ? 'Copied' : 'Copy'}
+                      </button>
                     </div>
                   )}
                   <pre className="p-6 text-sm overflow-x-auto">
