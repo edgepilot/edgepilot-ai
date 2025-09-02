@@ -382,8 +382,11 @@ export default function StreamingChat() {
           rows={2}
           className="flex-1 resize-none rounded-md border border-gray-700 bg-black/50 text-gray-100 placeholder-gray-500 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600"
         />
-        <button disabled={!input || loading || status === 'connecting' || status === 'streaming'} className="px-4 py-2 rounded-md bg-white text-black font-medium disabled:opacity-40">
-          Send
+        <button
+          disabled={!input || loading || status === 'connecting' || status === 'streaming' || status === 'pending'}
+          className="px-4 py-2 rounded-md bg-white text-black font-medium disabled:opacity-40"
+        >
+          {status === 'pending' ? 'Sending…' : 'Send'}
         </button>
       </form>
     </div>
