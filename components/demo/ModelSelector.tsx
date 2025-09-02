@@ -83,9 +83,15 @@ export default function ModelSelector({ selectedModel, onModelChange }: ModelSel
           <div className="font-medium text-white">{selectedModelData?.name || (selectedModel || 'Select a model')}</div>
           <div className="text-sm text-gray-400">{selectedModelData?.parameters || (selectedModelData ? '' : '—')}</div>
         </div>
-        <div className={`px-2 py-1 rounded text-xs font-medium border ${getCategoryColor(selectedModelData?.category || 'openai')}`}>
-          {(selectedModelData?.category || 'openai').toUpperCase()}
-        </div>
+        {selectedModelData ? (
+          <div className={`px-2 py-1 rounded text-xs font-medium border ${getCategoryColor(selectedModelData.category)}`}>
+            {selectedModelData.category.toUpperCase()}
+          </div>
+        ) : (
+          <div className="px-2 py-1 rounded text-xs font-medium border bg-gray-800 text-gray-400 border-gray-700">
+            MODEL
+          </div>
+        )}
         <svg className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>

@@ -1,3 +1,4 @@
+import { NextResponse } from 'next/server';
 import { createNextHandler } from '@edgecraft/copilotkit-workers-ai';
 
 export const runtime = 'edge';
@@ -11,3 +12,11 @@ export const POST = createNextHandler({
   maxRetries: 2,
   debug: process.env.NODE_ENV !== 'production'
 });
+
+export async function GET() {
+  return NextResponse.json({ ok: true, endpoint: 'ai/chat', streaming: true });
+}
+
+export async function HEAD() {
+  return new Response(null, { status: 200 });
+}

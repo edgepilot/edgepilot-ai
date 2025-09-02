@@ -1,6 +1,6 @@
-# 🚀 CopilotEdge Starter App
+# 🚀 Edgecraft Starter App
 
-A comprehensive Next.js starter application demonstrating how to build AI-powered applications using **CopilotEdge** with **CopilotKit** and **Cloudflare Workers AI**.
+A Next.js starter for building AI experiences with the **Edgecraft** connector and **Cloudflare Workers AI** (with optional OpenAI fallback). No vendor runtime required.
 
 ![Next.js](https://img.shields.io/badge/Next.js-15.4.6-black?logo=next.js)
 ![React](https://img.shields.io/badge/React-19.1.0-blue?logo=react)
@@ -48,19 +48,20 @@ Open [http://localhost:3000](http://localhost:3000) to see the app.
   - Feature showcase
 
 ### API Routes
-- **CopilotEdge Handler** (`app/api/copilotedge/route.ts`) - Pre-configured endpoint for AI requests
+- **Edgecraft Handler** (`app/api/ai/chat/route.ts`) - OpenAI-compatible chat endpoint (Cloudflare by default, OpenAI fallback optional)
 
 ### Features Demonstrated
-- ✅ CopilotKit integration with CopilotEdge
-- ✅ Multiple AI models (OpenAI OSS, Llama, Mistral)
-- ✅ Smart caching for cost reduction
-- ✅ Rate limiting
+- ✅ Streaming chat (SSE) with status HUD
+- ✅ Cmd/Ctrl+K autosuggest textarea
+- ✅ Model selector + per-request override
+- ✅ Provider toggle (Cloudflare/OpenAI)
+- ✅ System prompt + temperature controls
 - ✅ React 19 compatibility
 
 ## 🎯 How to Use
 
 ### 1. Chat Popup
-Click the chat icon in the bottom-right corner to open the AI assistant.
+Click the chat icon in the bottom-right corner to open the assistant. Use the header controls to switch provider (Cloudflare/OpenAI), set system prompt, and temperature.
 
 ### 2. AI-Enhanced Textarea
 1. Click in the textarea
@@ -68,7 +69,7 @@ Click the chat icon in the bottom-right corner to open the AI assistant.
 3. Press **Cmd+K** (Mac) or **Ctrl+K** (Windows) to get AI suggestions
 
 ### 3. Switch Models
-Use the dropdown in the header to switch between different AI models:
+Use the model section to switch between different AI models:
 - **GPT-OSS-120B** - OpenAI's open-source model (best quality)
 - **GPT-OSS-20B** - Smaller, faster version
 - **Llama 3.3 70B** - Meta's latest model
@@ -77,25 +78,20 @@ Use the dropdown in the header to switch between different AI models:
 
 ## 🔧 Configuration Options
 
-Edit `app/api/copilotedge/route.ts` to customize:
+The Edgecraft handler reads from environment and request body:
 
-```typescript
-export const POST = createCopilotEdgeHandler({
-  model: "gpt-oss-120b",     // Change default model
-  debug: true,                // Enable/disable debug logs
-  cache: {
-    enabled: true,
-    ttl: 60                   // Cache duration in seconds
-  },
-  rateLimit: {
-    enabled: true,
-    maxRequests: 100,
-    windowMs: 60000           // Rate limit window
-  }
-});
-```
+- Env
+  - `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID`
+  - Optional OpenAI fallback: `OPENAI_API_KEY`, `OPENAI_MODEL` (default `gpt-4o-mini`)
+  - Optional default provider: `EDGECRAFT_PROVIDER=cloudflare|openai`
+- Request body fields (JSON)
+  - `messages`: Array<{ role, content }>
+  - `model` (optional): per-request model slug (e.g., `@cf/meta/llama-3.1-8b-instruct`)
+  - `provider` (optional): `cloudflare` | `openai`
+  - `stream` (optional): boolean
+  - `temperature` (optional): number (0–2)
 
-## 📚 Available Models
+## 📚 Available Models (examples)
 
 ### OpenAI Open-Source (Apache 2.0)
 - `gpt-oss-120b` - 120B parameters, comparable to GPT-4 mini
@@ -124,9 +120,8 @@ Check the console for debug messages. Common issues:
 
 ## 📖 Learn More
 
-- [CopilotEdge Documentation](https://github.com/Klammertime/copilotedge)
-- [CopilotKit Documentation](https://docs.copilotkit.ai)
-- [Cloudflare Workers AI](https://developers.cloudflare.com/workers-ai/)
+- Edgecraft connector (repo root)
+- Cloudflare Workers AI: https://developers.cloudflare.com/workers-ai/
 
 ## 🚢 Deployment
 
@@ -137,11 +132,7 @@ vercel --env CLOUDFLARE_API_TOKEN=your-token --env CLOUDFLARE_ACCOUNT_ID=your-ac
 ```
 
 ### Deploy to Cloudflare Pages
-```bash
-# Build for static export
-npm run build
-npx wrangler pages publish out
-```
+This starter targets Next.js (Vercel) for best streaming experience. If you deploy to Pages, use a compatible adapter or split the API route to a Worker.
 
 ### Environment Variables for Production
 Set these in your deployment platform:
@@ -160,27 +151,14 @@ NODE_ENV=production
 
 ## 🔧 Advanced Configuration
 
-### Custom Models
-Edit `app/api/copilotedge/route.ts`:
-```typescript
-export const POST = createCopilotEdgeHandler({
-  model: '@cf/meta/llama-3.3-70b-instruct', // Your preferred model
-  fallback: '@cf/meta/llama-3.1-8b-instruct', // Fallback option
-  // ... other config
-});
-```
-
-### Performance Optimization
-- **Caching**: Responses cached for 2 minutes by default
-- **Rate Limiting**: 100 requests/minute per IP
-- **Model Fallback**: Automatic fallback to smaller model if primary fails
-- **Retry Logic**: Up to 5 retries with exponential backoff
+- **Model fallback**: handler tries safe Cloudflare slugs; can fallback to OpenAI if configured.
+- **Retry logic**: exponential backoff on transient failures.
+- **Server-side logs**: provider error bodies are logged (dev) for debugging; clients receive safe messages (401/429/503).
 
 ### Security Best Practices
 - Store API tokens in environment variables only
-- Use rate limiting in production
-- Enable request logging for monitoring
-- Implement proper error handling
+- Add rate limiting in production
+- Enable server request logging/monitoring
 
 ## 🤝 Contributing
 
@@ -193,7 +171,7 @@ export const POST = createCopilotEdgeHandler({
 ## ❓ FAQ
 
 **Q: Which model should I use?**
-A: Start with `@cf/meta/llama-3.1-70b-instruct` for best quality, or `@cf/meta/llama-3.1-8b-instruct` for speed.
+A: Start with `@cf/meta/llama-3.1-8b-instruct` (widely available). Use 70B for higher quality.
 
 **Q: How do I reduce costs?**
 A: Enable caching, use smaller models, and implement rate limiting.
@@ -202,7 +180,7 @@ A: Enable caching, use smaller models, and implement rate limiting.
 A: Yes, configure `CLOUDFLARE_GATEWAY_ID` for custom domain routing.
 
 **Q: How do I monitor usage?**
-A: Check Cloudflare Workers dashboard for request metrics and billing.
+A: Check Cloudflare Workers dashboard for request metrics and billing. In dev, the server logs provider error text safely.
 
 ## 📋 Changelog
 
