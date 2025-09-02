@@ -4,6 +4,14 @@ import { useHomePageStore } from "../../stores/useHomePageStore";
 import ModelSelector from "./ModelSelector";
 
 type Msg = { role: "system" | "user" | "assistant" | string; content: string };
+const MAX_HISTORY = 200;
+
+function windowedPush(setter: React.Dispatch<React.SetStateAction<Msg[]>>, m: Msg) {
+  setter((prev) => {
+    const next = [...prev, m];
+    return next.length > MAX_HISTORY ? next.slice(next.length - MAX_HISTORY) : next;
+  });
+}
 type StreamStatus = "idle" | "pending" | "connecting" | "streaming" | "done" | "aborted" | "error";
 
 export default function StreamingChat() {
@@ -109,8 +117,9 @@ export default function StreamingChat() {
 
   async function sendNow() {
     if (loading || aborter) return; // prevent re-entrancy
-    const next = [...messages, { role: "user", content: input }];
-    setMessages(next);
+    const userMsg: Msg = { role: "user", content: input };
+    const toSend = [...messages, userMsg];
+    windowedPush(setMessages, userMsg);
     setInput("");
     setReply("");
     setLoading(true);
@@ -130,7 +139,7 @@ export default function StreamingChat() {
     const res = await fetch("/api/ai/chat", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ messages: next, stream: true, model: selectedModel }),
+      body: JSON.stringify({ messages: toSend, stream: true, model: selectedModel }),
       signal: controller.signal,
     });
 
@@ -197,7 +206,7 @@ export default function StreamingChat() {
       const end = performance.now();
       setElapsed(end - start);
       if (accumulated) {
-        setMessages((prev) => [...prev, { role: "assistant", content: accumulated }]);
+        windowedPush(setMessages, { role: "assistant", content: accumulated });
       }
       try { await reader.cancel(); } catch {}
     }
