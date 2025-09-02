@@ -31,10 +31,10 @@ export default function Page() {
                     </Link>
                   </li>
                   <li>
-                    <Link
+                <Link
                       href="/showcase"
                       aria-current="page"
-                      className="text-white font-medium border-b border-white/60"
+                      className="text-white font-medium border-b border-white/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
                     >
                       Showcase
                     </Link>

@@ -21,7 +21,10 @@ export default function CopyButton({ text, label = 'Copy', className }: Props) {
   return (
     <button
       onClick={onCopy}
-      className={className || 'text-xs px-2 py-1 rounded-md border border-gray-700 text-gray-300 hover:bg-white/5'}
+      className={
+        className ||
+        'text-xs px-2 py-1 rounded-md border border-gray-700 text-gray-300 hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60'
+      }
       aria-label={copied ? 'Copied' : 'Copy code'}
       title={copied ? 'Copied' : 'Copy code'}
       type="button"
@@ -30,4 +33,3 @@ export default function CopyButton({ text, label = 'Copy', className }: Props) {
     </button>
   );
 }
-
