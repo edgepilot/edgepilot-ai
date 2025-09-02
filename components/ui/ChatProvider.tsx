@@ -93,26 +93,39 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         if (done) break;
         buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split("\n");
-        buffer = lines.pop() || "";
-        for (const line of lines) {
-          if (!line.startsWith("data: ")) continue;
-          const data = line.slice(6).trim();
-          if (data === "[DONE]") continue;
+        buffer = lines.pop() ?? "";
+        for (let raw of lines) {
+          // Trim CR and tolerate both `data:` and `data: ` prefixes
+          raw = raw.replace(/\r$/, "");
+          if (!raw.startsWith("data:")) continue;
+          const data = raw.slice(5).trim();
+          if (!data || data === "[DONE]") continue;
           try {
             const json = JSON.parse(data);
-            const delta = json.choices?.[0]?.delta;
-            const content = delta?.content || "";
-            if (content) {
-              reply += content;
-              // Update the same assistant message every chunk
+            const delta = json.choices?.[0]?.delta ?? {};
+            const hasRole = !!delta.role;
+            const contentChunk = delta.content ?? "";
+            // If the first delta only carries a role, ensure a message exists
+            if (streamIndexRef.current == null && (hasRole || contentChunk)) {
               setMessages((prev) => {
                 const updated = [...prev];
                 if (streamIndexRef.current == null) {
+                  updated.push({ id: newId('asst'), role: 'assistant', content: '' });
+                  streamIndexRef.current = updated.length - 1;
+                }
+                return updated;
+              });
+            }
+            if (contentChunk) {
+              reply += contentChunk;
+              setMessages((prev) => {
+                const updated = [...prev];
+                const idx = streamIndexRef.current;
+                if (idx == null) {
                   updated.push({ id: newId('asst'), role: 'assistant', content: reply });
                   streamIndexRef.current = updated.length - 1;
-                } else {
-                  const idx = streamIndexRef.current;
-                  if (updated[idx]) updated[idx] = { ...updated[idx], content: reply };
+                } else if (updated[idx]) {
+                  updated[idx] = { ...updated[idx], content: reply };
                 }
                 return updated;
               });
