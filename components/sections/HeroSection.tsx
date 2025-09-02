@@ -61,7 +61,7 @@ export function HeroSection({
         <div className={`max-w-2xl mx-auto mb-12 p-6 border rounded-lg ${statusStyles.container}`}>
           <div className="flex items-start space-x-3">
             <div className={`mt-1 ${statusStyles.icon}`}>
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg aria-hidden="true" focusable="false" className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path 
                   strokeLinecap="round" 
                   strokeLinejoin="round" 
