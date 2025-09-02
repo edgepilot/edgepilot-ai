@@ -45,11 +45,12 @@ export default function StreamingChat() {
       if (storedModel) setSelectedModel(storedModel);
     } catch {}
     return () => {
-      // Cleanup on unmount
-      aborter?.abort();
+      // Cleanup on unmount only
+      try { aborter?.abort(); } catch {}
       if (sendDebounceRef.current) window.clearTimeout(sendDebounceRef.current);
     };
-  }, [aborter]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Persist messages & model
   useEffect(() => {
