@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useMemo, useRef, useState, useEffect } from "react";
 import { useHomePageStore } from "../../stores/useHomePageStore";
 
-export type ChatMessage = { id?: string; role: "system" | "user" | "assistant" | string; content: string };
+export type ChatMessage = { id?: string; role: "system" | "user" | "assistant"; content: string };
 export type ProviderName = 'cloudflare' | 'openai';
 
 export type ChatContextType = {
@@ -14,6 +14,8 @@ export type ChatContextType = {
   loading: boolean;
   inFlight: boolean;
   stop: () => void;
+  reset: () => void;
+  appendMessage: (m: ChatMessage) => void;
   systemPrompt: string;
   setSystemPrompt: React.Dispatch<React.SetStateAction<string>>;
   temperature: number;
@@ -61,7 +63,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       if (typeof savedPrompt === 'string' && savedPrompt.length) setSystemPrompt(savedPrompt);
       const rawTemp = localStorage.getItem('edgecraft.temperature');
       const num = rawTemp ? Number(rawTemp) : NaN;
-      if (Number.isFinite(num)) setTemperature(num as number);
+      if (Number.isFinite(num)) setTemperature(Math.min(2, Math.max(0, num)));
     } catch {}
   }, []);
 
@@ -86,7 +88,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       const res = await fetch("/api/ai/chat", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ messages: outMessages, stream: true, model: selectedModel, provider, temperature }),
+        body: JSON.stringify({ messages: outMessages, stream: true, model: selectedModel || '@cf/meta/llama-3.1-8b-instruct', provider, temperature }),
         signal: controller.signal,
       });
       if (!res.ok || !res.body) throw new Error("network");
@@ -174,6 +176,17 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     try { controllerRef.current?.abort(); } catch {}
   }
 
+  function reset() {
+    try { controllerRef.current?.abort(); } catch {}
+    streamIndexRef.current = null;
+    setLoading(false);
+    setMessages([{ id: newId('sys'), role: 'system', content: systemPrompt }]);
+  }
+
+  function appendMessage(m: ChatMessage) {
+    setMessages((prev) => [...prev, m]);
+  }
+
   useEffect(() => { try { localStorage.setItem('edgecraft.provider', provider); } catch {} }, [provider]);
   useEffect(() => { try { localStorage.setItem('edgecraft.systemPrompt', systemPrompt); } catch {} }, [systemPrompt]);
   useEffect(() => { try { localStorage.setItem('edgecraft.temperature', String(temperature)); } catch {} }, [temperature]);
@@ -186,6 +199,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     loading,
     inFlight: loading,
     stop,
+    reset,
+    appendMessage,
     systemPrompt,
     temperature,
     provider,
