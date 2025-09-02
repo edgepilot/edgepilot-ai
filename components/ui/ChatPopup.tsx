@@ -217,7 +217,13 @@ export default function ChatPopup() {
             </div>
 
             {/* Messages */}
-            <div ref={listRef} className="max-h-80 overflow-y-auto overscroll-contain p-3 space-y-2">
+            <div
+              ref={listRef}
+              className="max-h-80 overflow-y-auto overscroll-contain p-3 space-y-2"
+              role="log"
+              aria-live="polite"
+              aria-busy={inFlight || loading}
+            >
               {messages.length > visibleCount && (
                 <div className="sticky top-0 z-10 -mt-2 mb-1 flex gap-2">
                   <button
