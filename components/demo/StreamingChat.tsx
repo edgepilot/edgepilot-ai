@@ -377,7 +377,8 @@ export default function StreamingChat() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
+            const mod = e.ctrlKey || e.metaKey;
+            if (e.key === 'Enter' && (mod || !e.shiftKey)) {
               e.preventDefault();
               if (input.trim()) send();
             }
