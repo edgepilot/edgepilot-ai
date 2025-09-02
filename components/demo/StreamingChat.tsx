@@ -64,7 +64,11 @@ export default function StreamingChat() {
   useEffect(() => {
     if (!atBottom) return;
     const el = scrollRef.current;
-    if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+    if (!el) return;
+    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+    requestAnimationFrame(() => {
+      el.scrollTo({ top: el.scrollHeight, behavior: reduced ? 'auto' : 'smooth' });
+    });
   }, [reply, messages.length, status, atBottom]);
 
   // Track scroll position
