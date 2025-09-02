@@ -313,11 +313,11 @@ export default function StreamingChat() {
         })()}
         <div className="ml-auto flex items-center gap-2">
           {(status === 'connecting' || status === 'streaming') && (
-            <button onClick={abort} className="px-2.5 py-1 rounded-md border border-rose-500/40 text-rose-300 hover:bg-rose-500/10">Stop</button>
+            <button onClick={abort} className="px-2.5 py-1 rounded-md border border-rose-500/40 text-rose-300 hover:bg-rose-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400/60">Stop</button>
           )}
-          <button onClick={resetAll} disabled={loading} className="px-2.5 py-1 rounded-md border border-blue-500/40 text-blue-300 hover:bg-blue-500/10 disabled:opacity-50">Reset</button>
-          <button onClick={clearMetrics} className="px-2.5 py-1 rounded-md border border-gray-600 text-gray-300 hover:bg-white/5">Clear Metrics</button>
-          <button onClick={copyLast} disabled={!reply && !messages.some(m => m.role === 'assistant')} className="px-2.5 py-1 rounded-md border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/10 disabled:opacity-50">Copy</button>
+          <button onClick={resetAll} disabled={loading} className="px-2.5 py-1 rounded-md border border-blue-500/40 text-blue-300 hover:bg-blue-500/10 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60">Reset</button>
+          <button onClick={clearMetrics} className="px-2.5 py-1 rounded-md border border-gray-600 text-gray-300 hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60">Clear Metrics</button>
+          <button onClick={copyLast} disabled={!reply && !messages.some(m => m.role === 'assistant')} className="px-2.5 py-1 rounded-md border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/10 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60">Copy</button>
         </div>
       </div>
       {/* Model selector */}
@@ -367,7 +367,7 @@ export default function StreamingChat() {
           <button
             type="button"
             onClick={() => { const el = scrollRef.current; if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' }); setAtBottom(true); }}
-            className="absolute right-3 bottom-3 px-2.5 py-1 rounded-md border border-gray-700 bg-black/60 text-gray-200 text-xs hover:bg-white/5"
+            className="absolute right-3 bottom-3 px-2.5 py-1 rounded-md border border-gray-700 bg-black/60 text-gray-200 text-xs hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
           >
             Jump to newest ↓
           </button>
@@ -396,7 +396,7 @@ export default function StreamingChat() {
         />
         <button
           disabled={!input || loading || status === 'connecting' || status === 'streaming' || status === 'pending'}
-          className="px-4 py-2 rounded-md bg-white text-black font-medium disabled:opacity-40"
+          className="px-4 py-2 rounded-md bg-white text-black font-medium disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
         >
           {status === 'pending' ? 'Sending…' : 'Send'}
         </button>

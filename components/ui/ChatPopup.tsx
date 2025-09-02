@@ -109,7 +109,7 @@ export default function ChatPopup() {
       <button
         ref={launcherRef}
         onClick={() => setOpen(!open)}
-        className="fixed right-4 bottom-4 z-30 h-12 w-12 rounded-full bg-white text-black shadow-lg hover:shadow-xl focus:outline-none"
+        className="fixed right-4 bottom-4 z-30 h-12 w-12 rounded-full bg-white text-black shadow-lg hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
         aria-label={open ? "Close chat" : "Open chat"}
         title={open ? "Close chat" : "Open chat"}
         aria-haspopup="dialog"
@@ -167,7 +167,7 @@ export default function ChatPopup() {
                 {inFlight ? (
                   <button
                     onClick={stop}
-                    className="text-xs px-2 py-1 rounded border border-rose-500/40 text-rose-300 hover:bg-rose-500/10"
+                    className="text-xs px-2 py-1 rounded border border-rose-500/40 text-rose-300 hover:bg-rose-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400/60"
                     title="Stop generation"
                   >
                     Stop
@@ -175,7 +175,7 @@ export default function ChatPopup() {
                 ) : null}
                 <button
                   onClick={() => setOpen(false)}
-                  className="text-xl leading-none"
+                  className="text-xl leading-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 rounded"
                   aria-label="Close chat"
                   title="Close chat"
                 >
@@ -229,14 +229,14 @@ export default function ChatPopup() {
                   <button
                     type="button"
                     onClick={() => setVisibleCount((c) => Math.min(messages.length, c + PAGE_SIZE))}
-                    className="px-2 py-0.5 rounded-md border border-gray-700 bg-black/60 text-xs text-gray-200 hover:bg-white/5"
+                    className="px-2 py-0.5 rounded-md border border-gray-700 bg-black/60 text-xs text-gray-200 hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
                   >
                     Load earlier ({messages.length - visibleCount})
                   </button>
                   <button
                     type="button"
                     onClick={() => setVisibleCount(messages.length)}
-                    className="px-2 py-0.5 rounded-md border border-gray-700 bg-black/60 text-xs text-gray-300 hover:bg-white/5"
+                    className="px-2 py-0.5 rounded-md border border-gray-700 bg-black/60 text-xs text-gray-300 hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
                   >
                     Load all
                   </button>
@@ -296,7 +296,7 @@ export default function ChatPopup() {
                 className="flex-1 resize-none rounded-md border border-gray-700 bg-black/50 text-gray-100 placeholder-gray-500 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600"
               />
               <p id={inputHintId} className="sr-only">Press Enter or Ctrl/Cmd+Enter to send. Shift+Enter inserts a newline.</p>
-              <button disabled={loading} className="px-3 py-2 rounded-md bg-white text-black text-sm disabled:opacity-40">Send</button>
+              <button disabled={loading} className="px-3 py-2 rounded-md bg-white text-black text-sm disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60">Send</button>
             </form>
             {emptyNotice && (
               <div aria-live="polite" className="px-3 pb-3 -mt-2 text-xs text-rose-300">
