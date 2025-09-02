@@ -330,7 +330,14 @@ export default function StreamingChat() {
       {status === 'error' && (
         <div className="border border-gray-700 bg-gray-900 text-rose-300 px-3 py-2 rounded-md text-xs">{errorMsg || 'Something went wrong'}</div>
       )}
-      <div ref={scrollRef} onScroll={handleScroll} className="relative space-y-3 max-h-[50vh] overflow-y-auto pr-1 overscroll-contain">
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="relative space-y-3 max-h-[50vh] overflow-y-auto pr-1 overscroll-contain"
+        role="log"
+        aria-live="polite"
+        aria-busy={loading || status === 'streaming'}
+      >
         {messages.map((m, i) => (
           <div key={m.id || `${m.role}|${m.content.length || 0}|${i}`} className={`group relative rounded-lg border px-4 py-3 ${m.role === 'assistant' ? 'bg-gray-900/60 border-gray-800' : m.role === 'system' ? 'bg-gray-900/40 border-gray-800' : 'bg-black/40 border-gray-800'}`}>
             <div className="text-xs uppercase tracking-wide mb-1 text-gray-400">{m.role}</div>
