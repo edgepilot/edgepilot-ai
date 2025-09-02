@@ -178,7 +178,7 @@ export default function StreamingChat() {
           if (!data || data === "[DONE]") continue;
           try {
             const json = JSON.parse(data);
-            if (!modelName && json.model) setModelName(json.model);
+            if (!modelName) setModelName(json.model || selectedModel || '-');
             const delta = json.choices?.[0]?.delta ?? {};
             const content = delta.content || "";
             if (content) {
