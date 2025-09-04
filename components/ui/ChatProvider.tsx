@@ -157,8 +157,13 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
             if (streamIndexRef.current == null && (hasRole || contentChunk)) {
               setMessages((prev) => {
                 const updated = [...prev];
-                if (streamIndexRef.current == null) {
+                // Double-check we haven't already added an assistant message
+                const lastMsg = updated[updated.length - 1];
+                if (streamIndexRef.current == null && lastMsg?.role !== 'assistant') {
                   updated.push({ id: newId('asst'), role: 'assistant', content: '' });
+                  streamIndexRef.current = updated.length - 1;
+                } else if (lastMsg?.role === 'assistant') {
+                  // Reuse the existing assistant message if one was already added
                   streamIndexRef.current = updated.length - 1;
                 }
                 return updated;
@@ -177,9 +182,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         const idx = streamIndexRef.current;
         if (idx != null && updated[idx]) {
           updated[idx] = { ...updated[idx], content: reply };
-          return updated;
         }
-        updated.push({ id: newId('asst'), role: 'assistant', content: reply });
+        // Don't create a new message if we didn't track one - something went wrong
         return updated;
       });
     } catch (e: any) {
