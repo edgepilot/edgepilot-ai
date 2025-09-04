@@ -25,7 +25,7 @@ function deriveModel(m: { id: string; name: string; description: string }): Mode
   else if (id.includes('@cf/meta')) category = 'meta';
   else if (id.includes('mistral')) category = 'mistral';
   const paramMatch = id.match(/(\d+\.?\d*)[bB]/) || name.match(/(\d+\.?\d*)[bB]/i);
-  const parameters = paramMatch ? `${paramMatch[1].toUpperCase()}B` : '';
+  const parameters = paramMatch?.[1] ? `${paramMatch[1].toUpperCase()}B` : '';
   const speed: Speed = parameters === '8B' || parameters === '7B' ? 'fast' : parameters.includes('120') ? 'slow' : 'medium';
   return { id, name, description, category, parameters, speed };
 }

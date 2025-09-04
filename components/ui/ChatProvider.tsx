@@ -76,9 +76,10 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     // Commit the user message and capture the exact snapshot we will send
     setMessages((prev) => {
       const user: ChatMessage = { id: newId('usr'), role: 'user', content: input };
-      const hasSystemFirst = prev.length > 0 && prev[0].role === 'system';
-      const ensuredSystem: ChatMessage = hasSystemFirst
-        ? { ...prev[0], content: systemPrompt }
+      const firstMessage = prev[0];
+      const hasSystemFirst = prev.length > 0 && firstMessage?.role === 'system';
+      const ensuredSystem: ChatMessage = hasSystemFirst && firstMessage
+        ? { ...firstMessage, content: systemPrompt }
         : { id: newId('sys'), role: 'system', content: systemPrompt };
       const rest: ChatMessage[] = hasSystemFirst ? prev.slice(1) : prev;
       const base: ChatMessage[] = [ensuredSystem, ...rest];

@@ -76,12 +76,12 @@ export default function Page() {
               delivering fast, scalable AI experiences at the edge.
             </p>
             <div className="flex items-center justify-center space-x-4">
-              <a href="/#demo" className="px-6 py-3 bg-gradient-to-r from-red-500 to-pink-500 text-white font-medium rounded-lg hover:shadow-lg hover:shadow-red-500/25 transition-all">
+              <Link href="/#demo" className="px-6 py-3 bg-gradient-to-r from-red-500 to-pink-500 text-white font-medium rounded-lg hover:shadow-lg hover:shadow-red-500/25 transition-all">
                 Start Building
-              </a>
-              <a href="/" className="px-6 py-3 bg-gray-800 text-white font-medium rounded-lg border border-gray-700 hover:bg-gray-700 transition-colors">
+              </Link>
+              <Link href="/" className="px-6 py-3 bg-gray-800 text-white font-medium rounded-lg border border-gray-700 hover:bg-gray-700 transition-colors">
                 View Demo
-              </a>
+              </Link>
             </div>
           </div>
 

@@ -147,8 +147,8 @@ export default function ChatPopup() {
               const first = focusable[0];
               const last = focusable[focusable.length - 1];
               const active = (root.contains(document.activeElement) ? document.activeElement : null) as HTMLElement | null;
-              if (!e.shiftKey && (active === last || !active)) { e.preventDefault(); first.focus(); }
-              if (e.shiftKey && (active === first || !active)) { e.preventDefault(); last.focus(); }
+              if (!e.shiftKey && (active === last || !active) && first) { e.preventDefault(); first.focus(); }
+              if (e.shiftKey && (active === first || !active) && last) { e.preventDefault(); last.focus(); }
             }}
           >
             <div className="flex items-center justify-between px-3 py-2 border-b border-gray-800">
