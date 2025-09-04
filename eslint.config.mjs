@@ -18,7 +18,7 @@ const config = [
     languageOptions: {
       parser: tsParser,
       parserOptions: {
-        project: "./tsconfig.json",
+        project: "./tsconfig.eslint.json",
         ecmaVersion: "latest",
         sourceType: "module",
         ecmaFeatures: {
