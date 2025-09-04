@@ -115,8 +115,9 @@ export const POST = async (req: Request) => {
   }
 
   // Use override model if provided and different from default
-  if (overrideModel && overrideModel !== DEFAULT_MODEL) {
+  if (overrideModel && overrideModel !== DEFAULT_MODEL && CF_API_TOKEN && CF_ACCOUNT_ID) {
     // Build a one-off handler with the override model
+    // We've already verified these exist via the realPost check above
     const onceHandler = createNextHandler({
       apiKey: CF_API_TOKEN,
       accountId: CF_ACCOUNT_ID,
