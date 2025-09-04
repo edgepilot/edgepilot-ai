@@ -72,30 +72,48 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     setLoading(true);
     const controller = new AbortController();
     controllerRef.current = controller;
-    let outMessages: ChatMessage[] = [];
-    // Commit the user message and capture the exact snapshot we will send
-    setMessages((prev) => {
-      const user: ChatMessage = { id: newId('usr'), role: 'user', content: input };
-      const firstMessage = prev[0];
-      const hasSystemFirst = prev.length > 0 && firstMessage?.role === 'system';
-      const ensuredSystem: ChatMessage = hasSystemFirst && firstMessage
-        ? { ...firstMessage, content: systemPrompt }
-        : { id: newId('sys'), role: 'system', content: systemPrompt };
-      const rest: ChatMessage[] = hasSystemFirst ? prev.slice(1) : prev;
-      const base: ChatMessage[] = [ensuredSystem, ...rest];
-      outMessages = [...base, user];
-      return [...prev, user];
-    });
+    
+    // Build the messages to send BEFORE updating state
+    const user: ChatMessage = { id: newId('usr'), role: 'user', content: input };
+    const currentMessages = messages;
+    const firstMessage = currentMessages[0];
+    const hasSystemFirst = currentMessages.length > 0 && firstMessage?.role === 'system';
+    const ensuredSystem: ChatMessage = hasSystemFirst && firstMessage
+      ? { ...firstMessage, content: systemPrompt }
+      : { id: newId('sys'), role: 'system', content: systemPrompt };
+    const rest: ChatMessage[] = hasSystemFirst ? currentMessages.slice(1) : currentMessages;
+    const base: ChatMessage[] = [ensuredSystem, ...rest];
+    const outMessages: ChatMessage[] = [...base, user];
+    
+    // Now update the UI state
+    setMessages((prev) => [...prev, user]);
+    
     let reply = "";
     try {
-      // Build messages with current system prompt
+      // Send the messages we built
       const res = await fetch("/api/ai/chat", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ messages: outMessages, stream: true, model: selectedModel || '@cf/meta/llama-3.1-8b-instruct', provider, temperature }),
         signal: controller.signal,
       });
-      if (!res.ok || !res.body) throw new Error("network");
+      
+      // Better error handling for non-OK responses
+      if (!res.ok) {
+        let errorMessage = `HTTP ${res.status}`;
+        try {
+          const errorData = await res.json();
+          errorMessage = errorData.error || errorData.message || errorMessage;
+        } catch {
+          // If not JSON, try text
+          try {
+            errorMessage = await res.text() || errorMessage;
+          } catch {}
+        }
+        throw new Error(errorMessage);
+      }
+      
+      if (!res.body) throw new Error("No response body");
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let buffer = "";
@@ -167,7 +185,9 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     } catch (e: any) {
       // Only append failure if not a user-initiated abort
       if (!(e?.name === 'AbortError' || controller.signal.aborted)) {
-        setMessages((prev) => [...prev, { id: newId('asst'), role: "assistant", content: "(request failed)" }]);
+        console.error('Chat request failed:', e);
+        const errorMessage = e?.message || 'Request failed';
+        setMessages((prev) => [...prev, { id: newId('asst'), role: "assistant", content: `(Error: ${errorMessage})` }]);
       }
     } finally {
       setLoading(false);

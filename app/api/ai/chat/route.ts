@@ -82,62 +82,10 @@ export const POST = async (req: Request) => {
     );
   }
 
-  // Optional: Allow simple per-request model overrides for demos
-  let overrideModel: string | undefined;
+  // Normal path - no model override checking in production
+  // The model override feature was causing request body consumption issues
+  // Model selection should be handled at the client level instead
   
-  // Only allow overrides in development/demo mode
-  if (DEBUG) {
-    try {
-      const clone = req.clone(); // body can only be read once
-      const data = await clone.json().catch(() => null);
-      
-      // Check for model override in the request
-      if (data && typeof data.model === 'string' && data.model.trim()) {
-        const requestedModel = data.model.trim();
-        
-        // Validate it's a supported model (basic validation)
-        const supportedModels = [
-          '@cf/meta/llama-3.1-8b-instruct',
-          '@cf/meta/llama-3.1-70b-instruct',
-          '@cf/meta/llama-3.3-70b-instruct',
-          '@cf/mistral/mistral-7b-instruct-v0.2',
-          'gpt-oss-20b',
-          'gpt-oss-120b'
-        ];
-        
-        if (supportedModels.includes(requestedModel)) {
-          overrideModel = requestedModel;
-        }
-      }
-    } catch {
-      // Ignore parse errors; treat as normal streaming call
-    }
-  }
-
-  // Use override model if provided and different from default
-  if (overrideModel && overrideModel !== DEFAULT_MODEL && CF_API_TOKEN && CF_ACCOUNT_ID) {
-    // Build a one-off handler with the override model
-    // We've already verified these exist via the realPost check above
-    const onceHandler = createNextHandler({
-      apiKey: CF_API_TOKEN,
-      accountId: CF_ACCOUNT_ID,
-      model: overrideModel,
-      stream: true,
-      cache: false,
-      maxRetries: 2,
-      debug: DEBUG,
-    });
-    
-    try {
-      const res = await onceHandler(req);
-      return cors(res);
-    } catch (error) {
-      console.error(`Model override failed for ${overrideModel}:`, error);
-      // Fall back to default handler
-    }
-  }
-
-  // Normal path with default model
   try {
     const res = await realPost(req);
     return cors(res);
