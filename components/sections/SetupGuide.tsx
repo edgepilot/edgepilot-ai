@@ -18,6 +18,7 @@ interface SetupGuideProps {
   onStepChange: (step: number) => void;
   onCheckConfig?: () => void;
   isConfigured?: boolean;
+  missingEnvVars?: string[];
 }
 
 export function SetupGuide({ 
@@ -27,7 +28,8 @@ export function SetupGuide({
   currentStep,
   onStepChange,
   onCheckConfig,
-  isConfigured = false
+  isConfigured = false,
+  missingEnvVars = []
 }: SetupGuideProps) {
   const handleButtonClick = (stepNumber: number) => {
     if (stepNumber === 2 && onCheckConfig) {
@@ -104,11 +106,23 @@ export function SetupGuide({
                             <span>Setup complete! Try the demos below.</span>
                           </div>
                         ) : (
-                          <div className="flex items-center space-x-2 text-yellow-400">
-                            <svg aria-hidden="true" focusable="false" className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <span>Configuration not detected. Check your environment variables.</span>
+                          <div className="space-y-2">
+                            <div className="flex items-center space-x-2 text-yellow-400">
+                              <svg aria-hidden="true" focusable="false" className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              <span>Configuration not detected. Check your environment variables.</span>
+                            </div>
+                            {missingEnvVars.length > 0 && (
+                              <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-3 mt-2">
+                                <p className="text-red-400 text-sm font-semibold mb-1">Missing environment variables:</p>
+                                <ul className="list-disc list-inside text-red-300 text-sm">
+                                  {missingEnvVars.map((envVar) => (
+                                    <li key={envVar}>{envVar}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
                           </div>
                         )}
                       </>

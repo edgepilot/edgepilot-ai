@@ -12,10 +12,15 @@ type Props = {
 export default function EdgeTextarea({ value, onChange, placeholder, className }: Props) {
   const [suggestion, setSuggestion] = useState<string>("");
   const [loading, setLoading] = useState(false);
+  const [isMac, setIsMac] = useState<boolean | null>(null);
   const { selectedModel } = useHomePageStore();
   const taRef = useRef<HTMLTextAreaElement | null>(null);
 
   const canSuggest = useMemo(() => value.trim().length > 0 && !loading, [value, loading]);
+
+  useEffect(() => {
+    setIsMac(/Mac|iPhone|iPad/.test(navigator.userAgent));
+  }, []);
 
   const fetchSuggestion = useCallback(async () => {
     if (!canSuggest) return;
@@ -80,11 +85,16 @@ export default function EdgeTextarea({ value, onChange, placeholder, className }
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={(e) => {
-          const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform);
-          const meta = isMac ? e.metaKey : e.ctrlKey;
+          const isMacLocal = isMac ?? (typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.userAgent));
+          const meta = isMacLocal ? e.metaKey : e.ctrlKey;
+          
           if (meta && e.key.toLowerCase() === 'k') {
             e.preventDefault();
             fetchSuggestion();
+          }
+          if (e.key === 'Tab' && suggestion) {
+            e.preventDefault();
+            accept();
           }
           if (e.key === 'Escape' && suggestion) {
             e.preventDefault();
@@ -106,7 +116,7 @@ export default function EdgeTextarea({ value, onChange, placeholder, className }
       )}
 
       <div className="absolute left-3 bottom-3 text-[10px] text-gray-500">
-        Press {typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘' : 'Ctrl'}+K for suggestion
+        Press {isMac === null ? 'Cmd/Ctrl' : isMac ? '⌘' : 'Ctrl'}+K for suggestion
       </div>
     </div>
   );

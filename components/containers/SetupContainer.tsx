@@ -7,7 +7,7 @@ import { useHomePageStore } from '../../stores/useHomePageStore';
 import { setupSteps } from '../../data/setupSteps';
 
 export function SetupContainer() {
-  const { isConfigured, refetch } = useConfigStatus();
+  const { isConfigured, details, refetch } = useConfigStatus();
   const { currentSetupStep, setSetupStep } = useHomePageStore();
   
   const handleStepChange = (step: number) => {
@@ -25,6 +25,7 @@ export function SetupContainer() {
       onStepChange={handleStepChange}
       onCheckConfig={() => refetch()}
       isConfigured={isConfigured}
+      missingEnvVars={details?.missing || []}
     />
   );
 }

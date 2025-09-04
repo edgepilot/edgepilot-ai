@@ -1,34 +1,54 @@
 import { useQuery } from '@tanstack/react-query';
 
-async function checkEnvConfig(endpoint: string = '/api/ai/chat') {
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ messages: [{ role: 'user', content: 'healthcheck' }], stream: false })
-  });
-  
-  if (!response.ok && response.status === 500) {
-    throw new Error('Configuration check failed');
+async function ping(method: 'HEAD' | 'GET', ms: number) {
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), ms);
+  try {
+    const res = await fetch('/api/health', { method, signal: ctl.signal });
+    const ok = res.ok;
+    const details = method === 'GET' ? await res.json().catch(() => null) : null;
+    return { ok, details };
+  } finally {
+    clearTimeout(t);
   }
-  
-  return { isConfigured: response.ok };
+}
+
+async function checkHealth() {
+  // Fast path
+  const head = await ping('HEAD', 3000).catch(() => ({ ok: false, details: null }));
+  if (head.ok) return { isConfigured: true, details: null };
+
+  // Fallback with details
+  const get = await ping('GET', 3000).catch(() => ({ ok: false, details: null }));
+  return { isConfigured: get.ok, details: get.details };
 }
 
 export function useConfigStatus() {
-  const query = useQuery({
-    queryKey: ['config-status'],
-    queryFn: () => checkEnvConfig(),
-    // Check on mount and every 30 seconds
+  const q = useQuery({
+    queryKey: ['health'],
+    queryFn: checkHealth,
     refetchInterval: 30000,
-    // Keep retrying if failed
-    retry: true,
-    retryDelay: 5000,
+    retry: 2,
+    retryDelay: (i) => Math.min(1000 * 2 ** i, 8000),
+    staleTime: 10000,
+    gcTime: 60000,
   });
 
+  const status: 'checking' | 'configured' | 'unconfigured' | 'error' =
+    q.isLoading
+      ? 'checking'
+      : q.data?.isConfigured
+      ? 'configured'
+      : q.isError
+      ? 'error'
+      : 'unconfigured';
+
   return {
-    isConfigured: query.data?.isConfigured ?? false,
-    isChecking: query.isLoading,
-    error: query.error,
-    refetch: query.refetch,
+    status,
+    isConfigured: q.data?.isConfigured ?? false,
+    isChecking: q.isLoading,
+    details: q.data?.details ?? null,
+    error: q.error,
+    refetch: q.refetch,
   };
 }
