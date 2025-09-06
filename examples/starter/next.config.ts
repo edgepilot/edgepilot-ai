@@ -69,7 +69,7 @@ const nextConfig: NextConfig = {
   //   return [
   //     {
   //       source: "/docs",
-  //       destination: "https://github.com/your-repo/wiki",
+  //       destination: "https://github.com/edgepilot/edgepilot/wiki",
   //       permanent: false,
   //     },
   //   ];
