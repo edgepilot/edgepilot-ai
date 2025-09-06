@@ -149,3 +149,7 @@ Audrey Klammer
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+## Disclaimer
+
+EdgePilot is an independent project and is not affiliated with, endorsed by, or associated with Open Text Corporation, Cloudflare, Inc., or any other company mentioned in this documentation. All trademarks are the property of their respective owners.
