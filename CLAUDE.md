@@ -1,62 +1,211 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with the **copilotedge** package.
 
-## Common Commands
+## PROJECT STATUS: Ready to Publish! 🚀
+
+Claude Code has successfully refactored this into a single npm package. The structure is now optimized for a solo developer to maintain and ship.
+
+## Current Structure
+
+```
+copilotedge-starter/            # Main package root (will rename to copilotedge)
+├── src/                        # All source code (consolidated)
+│   ├── index.ts               # Main exports
+│   ├── next.ts                # Next.js handler
+│   ├── fetch.ts               # Fetch handler
+│   ├── driver.ts              # Cloudflare driver
+│   └── core/                  # Core functionality
+├── dist/                       # Built package (TypeScript output)
+├── examples/
+│   └── starter/               # Demo Next.js app
+│       ├── package.json       # Separate package.json for demo
+│       └── [demo app files]
+├── package.json               # Single package.json for copilotedge
+├── tsconfig.json
+└── README.md
+```
+
+## Key Commands
 
 ```bash
-# Development
-pnpm dev          # Start development server on http://localhost:3000
-pnpm build        # Build for production
-pnpm start        # Start production server
-pnpm lint         # Run ESLint
+# Package Development
+pnpm build        # Build the package (compiles TypeScript to dist/)
+pnpm dev          # Watch mode for development
+pnpm clean        # Clean dist directory
 
-# Package Management (uses pnpm v10.14.0)
-pnpm install      # Install dependencies
-pnpm add [pkg]    # Add new dependency
+# Testing with Example
+cd examples/starter
+pnpm dev         # Run the demo app to test the package
+pnpm build       # Build the demo app
+
+# Publishing
+npm publish      # Publish to npm (from root)
 ```
 
-## Architecture Overview
+## What This Package Does
 
-This is a Next.js 15.4.6 application with React 19.1.0 that integrates custom local chat components with Cloudflare Workers AI via the CopilotEdge package.
+**copilotedge** provides Cloudflare Workers AI integration for Next.js and React apps:
+- Zero cold-start AI at the edge
+- Reduces AI costs by using Cloudflare's edge network
+- Provides streaming, caching, and automatic retries
+- Works with any Cloudflare Workers AI model
+- Drop-in integration for Next.js 13.4+ with App Router
 
-### Core Integration Flow
-1. **Frontend**: Local components (`ChatProvider`, `ChatPopup`, `EdgeTextarea`) handle UI interactions
-2. **API Route**: `/api/ai/chat/route.ts` uses `createNextHandler` from `@edgecraft/copilotkit-workers-ai`
-3. **Backend**: Routes requests to Cloudflare Workers AI models
+## Environment Variables
 
-### Key Files
-- `app/api/ai/chat/route.ts` - Main API handler for AI requests
-- `app/layout.tsx` - Wraps app with ChatProvider and includes ChatPopup
-- `app/page.tsx` - Main demo page with model selector and interactive examples
-
-### Environment Configuration
-
-Required environment variables (create `.env.local` from `.env.local.example`):
+Required for the package to work:
 ```
-CLOUDFLARE_API_TOKEN=your-api-token  # Required: Cloudflare API token with Workers AI permissions
-CLOUDFLARE_ACCOUNT_ID=your-account   # Required: Cloudflare account ID
+CLOUDFLARE_API_TOKEN=your-api-token  # Cloudflare API token with Workers AI permissions
+CLOUDFLARE_ACCOUNT_ID=your-account   # Cloudflare account ID
 ```
 
-Optional configuration:
-- `COPILOT_MODEL` - Override default model (default: `@cf/meta/llama-3.1-70b-instruct`)
-- `COPILOT_DEBUG` - Enable debug logging (default: `true` in development)
-- `COPILOT_CACHE_TIMEOUT` - Cache duration in ms (default: 120000)
-- `COPILOT_RATE_LIMIT` - Requests per minute (default: 100)
+## Pre-Publish Checklist
 
-### Available AI Models
+Before running `npm publish`, verify:
 
-The application supports multiple Cloudflare Workers AI models:
-- `gpt-oss-120b` - OpenAI open-source 120B (best quality)
-- `gpt-oss-20b` - OpenAI open-source 20B (faster)
+### 1. Package.json Essentials
+- [x] Name: `copilotedge`
+- [x] Version: `0.1.0`
+- [x] Description is clear
+- [x] Main and types point to dist/
+- [x] Files array includes dist/ and README.md
+- [x] Keywords include relevant terms
+- [ ] Repository URL is updated
+- [ ] Author name is set
+
+### 2. README.md Must Have
+- [x] Clear value proposition
+- [x] Installation instructions
+- [x] Basic usage example
+- [x] Environment variables documented
+- [x] Link to examples
+
+### 3. Quick Tests
+```bash
+# 1. Build works
+pnpm build
+
+# 2. Example still works
+cd examples/starter
+pnpm dev
+# Test the chat functionality
+
+# 3. Package looks right
+cd ../..
+npm pack --dry-run  # See what will be published
+```
+
+### 4. Version Strategy
+- Start with `0.1.0` (not 1.0.0) - sets expectations
+- Use semantic versioning going forward
+- Don't worry about perfection for 0.1.0
+
+## Publishing Steps
+
+```bash
+# 1. Make sure you're logged in to npm
+npm login
+
+# 2. Do a dry run first
+npm publish --dry-run
+
+# 3. If everything looks good, publish!
+npm publish
+
+# 4. Verify it worked
+npm view copilotedge
+```
+
+## Available AI Models
+
+The package supports multiple Cloudflare Workers AI models:
 - `@cf/meta/llama-3.3-70b-instruct` - Meta's latest 70B
 - `@cf/meta/llama-3.1-8b-instruct` - Fast lightweight 8B
 - `@cf/mistral/mistral-7b-instruct-v0.2` - Efficient 7B
+- And many more...
 
-### Testing
+## What NOT to Do Before Publishing
 
-To verify the setup:
-1. Check environment configuration status in the UI header
-2. Test the chat popup (bottom-right corner)
-3. Test AI-enhanced textarea with Cmd/Ctrl+K
-4. Monitor browser console for debug logs in development
+**DO NOT**:
+- Add more features
+- Refactor working code
+- Wait for perfect documentation
+- Add complex CI/CD
+- Worry about edge cases
+- Second-guess the single package structure
+- Try to make it a monorepo again
+
+**DO**:
+- Ship v0.1.0 TODAY
+- Add the npm badge to your GitHub README after publishing
+- Tweet about it
+- Fix issues in v0.1.1 based on real feedback
+
+## Post-Publish Tasks
+
+After publishing v0.1.0:
+1. Create GitHub release with same version tag
+2. Share in relevant communities (Reddit r/reactjs, Twitter, Discord)
+3. Write a simple blog post about edge AI and cost savings
+4. Start collecting real user feedback
+
+## For Future Claude Sessions
+
+When working on updates:
+- This is a SINGLE package (not a monorepo)
+- The refactoring is DONE - don't suggest restructuring
+- Focus on features and bug fixes, not architecture
+- Keep the solo developer perspective
+- Ship small updates frequently (0.1.1, 0.1.2, etc.)
+
+## Success Metrics
+
+v0.1.0 is successful if:
+- ✅ It publishes to npm without errors
+- ✅ Someone can install and use it
+- ✅ The example app demonstrates it works
+- ✅ You've told people it exists
+
+That's it. Everything else is iteration.
+
+## API Reference
+
+### `createNextHandler(options)`
+
+Creates a Next.js API route handler for AI chat endpoints.
+
+```typescript
+import { createNextHandler } from 'copilotedge/next';
+
+export const runtime = 'edge';
+
+const handler = createNextHandler({
+  model: '@cf/meta/llama-3.1-8b-instruct',
+  stream: true,
+  cache: false,
+  debug: false
+});
+
+export const POST = handler;
+```
+
+## Remember
+
+- You've already built something valuable (zero cold-start AI!)
+- The hard refactoring work is DONE
+- Perfect is the enemy of shipped
+- Version 0.1.0 means "early but useful"
+- You can always release 0.1.1 tomorrow
+
+## The One Command That Matters
+
+```bash
+npm publish
+```
+
+Run it. Today. Now. The world needs zero cold-start AI at the edge.
+
+---
+
+**Note to Claude Code**: The refactoring is complete. Help with publishing, documentation, and feature additions - not restructuring. This is a working single package ready to ship.
