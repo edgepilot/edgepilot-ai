@@ -31,7 +31,7 @@ export default function EdgeTextarea({ value, onChange, placeholder, className }
         { role: "system", content: "You are a concise writing assistant. Continue the user's text with 1-2 sentences." },
         { role: "user", content: value.slice(-4000) }
       ];
-      const provider = (typeof window !== 'undefined' && (localStorage.getItem('edgecraft.provider') as any)) || 'cloudflare';
+      const provider = (typeof window !== 'undefined' && (localStorage.getItem('edgepilot.provider') as any)) || 'cloudflare';
       const res = await fetch("/api/ai/chat", {
         method: "POST",
         headers: { "content-type": "application/json" },

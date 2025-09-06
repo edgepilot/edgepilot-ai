@@ -49,7 +49,7 @@ function coerceTheme(value: unknown, fallback: Theme = 'dark'): Theme {
 export function ThemeProvider({
   children,
   defaultTheme = 'dark',
-  storageKey = 'copilotedge-theme',
+  storageKey = 'edgepilot-theme',
 }: ThemeProviderProps) {
   // Initialize from prop (no window on server)
   const [theme, setThemeState] = useState<Theme>(() => defaultTheme);

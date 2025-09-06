@@ -57,11 +57,11 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   const [temperature, setTemperature] = useState<number>(0.7);
   useEffect(() => {
     try {
-      const savedProvider = localStorage.getItem('edgecraft.provider') as ProviderName | null;
+      const savedProvider = localStorage.getItem('edgepilot.provider') as ProviderName | null;
       if (savedProvider === 'openai' || savedProvider === 'cloudflare') setProvider(savedProvider);
-      const savedPrompt = localStorage.getItem('edgecraft.systemPrompt');
+      const savedPrompt = localStorage.getItem('edgepilot.systemPrompt');
       if (typeof savedPrompt === 'string' && savedPrompt.length) setSystemPrompt(savedPrompt);
-      const rawTemp = localStorage.getItem('edgecraft.temperature');
+      const rawTemp = localStorage.getItem('edgepilot.temperature');
       const num = rawTemp ? Number(rawTemp) : NaN;
       if (Number.isFinite(num)) setTemperature(Math.min(2, Math.max(0, num)));
     } catch {}
@@ -215,9 +215,9 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     setMessages((prev) => [...prev, m]);
   }
 
-  useEffect(() => { try { localStorage.setItem('edgecraft.provider', provider); } catch {} }, [provider]);
-  useEffect(() => { try { localStorage.setItem('edgecraft.systemPrompt', systemPrompt); } catch {} }, [systemPrompt]);
-  useEffect(() => { try { localStorage.setItem('edgecraft.temperature', String(temperature)); } catch {} }, [temperature]);
+  useEffect(() => { try { localStorage.setItem('edgepilot.provider', provider); } catch {} }, [provider]);
+  useEffect(() => { try { localStorage.setItem('edgepilot.systemPrompt', systemPrompt); } catch {} }, [systemPrompt]);
+  useEffect(() => { try { localStorage.setItem('edgepilot.temperature', String(temperature)); } catch {} }, [temperature]);
   const value = useMemo(() => ({
     messages,
     setMessages,

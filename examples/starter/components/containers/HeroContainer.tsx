@@ -9,7 +9,7 @@ export function HeroContainer() {
   
   return (
     <HeroSection
-      title="Welcome to CopilotEdge"
+      title="Welcome to EdgePilot"
       subtitle="Build AI-powered applications with Cloudflare Workers AI. This starter will guide you through setup and show you what's possible."
       isConfigured={isConfigured}
     />

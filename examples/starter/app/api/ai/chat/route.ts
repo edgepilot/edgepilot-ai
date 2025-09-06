@@ -5,7 +5,7 @@ export const runtime = 'edge';
 
 // Create the handler with default model
 const handler = createNextHandler({
-  model: process.env.EDGECRAFT_MODEL || '@cf/meta/llama-3.1-8b-instruct',
+  model: process.env.EDGEPILOT_MODEL || '@cf/meta/llama-3.1-8b-instruct',
   stream: true,
   cache: false,
   debug: process.env.NODE_ENV !== 'production'

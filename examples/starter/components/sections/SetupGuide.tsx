@@ -23,7 +23,7 @@ interface SetupGuideProps {
 
 export function SetupGuide({ 
   title = "Quick Setup Guide",
-  subtitle = "Get CopilotEdge running in 3 simple steps",
+  subtitle = "Get EdgePilot running in 3 simple steps",
   steps,
   currentStep,
   onStepChange,

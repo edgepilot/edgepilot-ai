@@ -11,7 +11,7 @@ export function createFetchHandler(config: Config) {
   const apiKey = config?.apiKey || process.env.CLOUDFLARE_API_TOKEN || '';
   const accountId = config?.accountId || process.env.CLOUDFLARE_ACCOUNT_ID || '';
   const model = config?.model || '@cf/meta/llama-3.1-8b-instruct';
-  const providerPref = (process.env.EDGECRAFT_PROVIDER || 'cloudflare').toLowerCase();
+  const providerPref = (process.env.EDGEPILOT_PROVIDER || 'cloudflare').toLowerCase();
   const openaiKey = process.env.OPENAI_API_KEY || '';
   const openaiModel = process.env.OPENAI_MODEL || 'gpt-4o-mini';
   const endpoint = `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/v1/chat/completions`;
@@ -106,7 +106,7 @@ export function createFetchHandler(config: Config) {
         try {
           const errTxt = await cfResponse.text();
           // eslint-disable-next-line no-console
-          console.error('[Edgecraft:fetch] Provider error:', status, errTxt?.slice(0, 500));
+          console.error('[EdgePilot:fetch] Provider error:', status, errTxt?.slice(0, 500));
         } catch {}
         if (status === 401 || status === 403) return new Response('Unauthorized', { status: 401 });
         if (status === 429) return new Response('Rate limit exceeded', { status: 429 });

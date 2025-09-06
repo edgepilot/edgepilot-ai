@@ -10,7 +10,7 @@ export const codeExamples: CodeExample[] = [
     title: "1. Create Your API Route",
     description: "Create app/api/ai/chat/route.ts:",
     fileName: "route.ts",
-    code: `import { createNextHandler } from '@edgecraft/copilotkit-workers-ai/next';
+    code: `import { createNextHandler } from 'edgepilot';
 
 export const runtime = 'edge';
 

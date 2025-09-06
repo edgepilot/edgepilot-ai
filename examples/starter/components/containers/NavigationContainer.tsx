@@ -11,7 +11,7 @@ export function NavigationContainer() {
   
   return (
     <Navigation 
-      logoText="CopilotEdge"
+      logoText="EdgePilot"
       badgeText="Starter"
       links={navigationLinks}
       statusBadge={<ConfigStatusBadge status={status} />}

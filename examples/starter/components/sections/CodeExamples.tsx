@@ -31,7 +31,7 @@ export function CodeExamples({
   subtitle = "Copy these examples to build your own AI features",
   examples,
   configurationTitle = "4. Configuration Options",
-  configurationDescription = "CopilotEdge supports many configuration options:",
+  configurationDescription = "EdgePilot supports many configuration options:",
   handlerOptions = [],
   availableModels = [],
   nextStepsTitle = "Ready to Build?",

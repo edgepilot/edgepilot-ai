@@ -27,7 +27,7 @@ export function HeroSection({
     },
     error: {
       title: "Configuration Required",
-      description: "CopilotEdge needs your Cloudflare credentials to work. Follow the setup guide below."
+      description: "EdgePilot needs your Cloudflare credentials to work. Follow the setup guide below."
     }
   }
 }: HeroSectionProps) {

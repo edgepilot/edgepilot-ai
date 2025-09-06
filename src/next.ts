@@ -49,7 +49,7 @@ export function createNextHandler(userConfig: Config = {}) {
   const debug = userConfig.debug ?? false;
   const maxRetries = userConfig.maxRetries ?? 3;
   const cache = userConfig.cache === false ? undefined : new SimpleCache<any>();
-  const providerPref = (process.env.EDGECRAFT_PROVIDER || 'cloudflare').toLowerCase();
+  const providerPref = (process.env.EDGEPILOT_PROVIDER || 'cloudflare').toLowerCase();
   const openaiKey = process.env.OPENAI_API_KEY || '';
   const openaiModel = process.env.OPENAI_MODEL || 'gpt-4o-mini';
 
@@ -96,7 +96,7 @@ export function createNextHandler(userConfig: Config = {}) {
       // Read provider error for server-side debugging only
       try {
         const errTxt = await response.text();
-        if (debug) console.error('[Edgecraft] Provider error:', status, errTxt?.slice(0, 500));
+        if (debug) console.error('[EdgePilot] Provider error:', status, errTxt?.slice(0, 500));
       } catch {}
       if (status === 401 || status === 403) throw new HttpError(401, 'Unauthorized');
       if (status === 429) throw new HttpError(429, 'Rate limit exceeded');
@@ -126,7 +126,7 @@ export function createNextHandler(userConfig: Config = {}) {
         return await callCloudflareAI(messages, streaming, m, temperature);
       } catch (e: any) {
         lastErr = e;
-        if (debug) console.warn('[Edgecraft] model failed:', m, e?.status || e?.message);
+        if (debug) console.warn('[EdgePilot] model failed:', m, e?.status || e?.message);
         // Only fall back on non-auth errors
         if (e instanceof HttpError && (e.status === 401 || e.status === 403)) throw e;
         // else try next
@@ -150,7 +150,7 @@ export function createNextHandler(userConfig: Config = {}) {
     });
     if (!response.ok) {
       const status = response.status;
-      try { const txt = await response.text(); if (debug) console.error('[Edgecraft] OpenAI error:', status, txt?.slice(0,500)); } catch {}
+      try { const txt = await response.text(); if (debug) console.error('[EdgePilot] OpenAI error:', status, txt?.slice(0,500)); } catch {}
       if (status === 401 || status === 403) throw new HttpError(401, 'Unauthorized');
       if (status === 429) throw new HttpError(429, 'Rate limit exceeded');
       throw new HttpError(503, 'Service unavailable');
@@ -167,7 +167,7 @@ export function createNextHandler(userConfig: Config = {}) {
         lastError = err;
         if (i < maxRetries - 1) {
           const delay = Math.min(1000 * Math.pow(2, i), 8000);
-          if (debug) console.log(`[Edgecraft] Retry ${i + 1}/${maxRetries} after ${delay}ms`);
+          if (debug) console.log(`[EdgePilot] Retry ${i + 1}/${maxRetries} after ${delay}ms`);
           await new Promise(res => setTimeout(res, delay));
         }
       }
@@ -315,7 +315,7 @@ export function createNextHandler(userConfig: Config = {}) {
       if (result instanceof Response) return result;
       return NextResponse.json(result);
     } catch (error: any) {
-      if (debug) console.error('[Edgecraft] Error:', error);
+      if (debug) console.error('[EdgePilot] Error:', error);
       if (error instanceof HttpError) {
         return NextResponse.json({ error: error.publicMessage }, { status: error.status });
       }

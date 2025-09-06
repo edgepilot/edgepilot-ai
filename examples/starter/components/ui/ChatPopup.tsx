@@ -199,7 +199,7 @@ export default function ChatPopup() {
             }}
           >
             <div className="flex items-center justify-between px-3 py-2 border-b border-gray-800">
-              <div id={labelId} className="text-sm font-medium">Edgecraft Chat</div>
+              <div id={labelId} className="text-sm font-medium">EdgePilot Chat</div>
               <div className="flex items-center gap-2">
                 <label htmlFor="provider" className="sr-only">Model provider</label>
                 <select

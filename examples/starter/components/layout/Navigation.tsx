@@ -12,7 +12,7 @@ interface NavigationProps {
 }
 
 export function Navigation({ 
-  logoText = "CopilotEdge",
+  logoText = "EdgePilot",
   badgeText = "Starter",
   links = [],
   statusBadge

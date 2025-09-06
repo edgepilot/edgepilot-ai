@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
     optimizePackageImports: [
       "@tanstack/react-query",
       "zustand",
-      "@edgecraft/copilotkit-workers-ai"
+      "edgepilot"
     ],
   },
 

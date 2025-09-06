@@ -22,7 +22,7 @@ export default function Page() {
               <div className="flex items-center space-x-8">
                 <div className="flex items-center space-x-2">
                   <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-pink-500 rounded-lg" />
-                  <span className="text-xl font-bold">Edgecraft</span>
+                  <span className="text-xl font-bold">EdgePilot</span>
                 </div>
                 <ul className="hidden md:flex items-center gap-6" role="list">
                   <li>
@@ -64,7 +64,7 @@ export default function Page() {
           <div className="text-center max-w-4xl mx-auto">
             <div className="inline-flex items-center space-x-2 px-3 py-1 bg-gray-800/50 rounded-full border border-gray-700 mb-8">
               <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse motion-reduce:animate-none" />
-              <span className="text-sm text-gray-300">Edgecraft + Cloudflare Workers AI</span>
+              <span className="text-sm text-gray-300">EdgePilot + Cloudflare Workers AI</span>
             </div>
             <h1 className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-br from-white to-gray-400 bg-clip-text text-transparent">
               The AI copilot
@@ -72,7 +72,7 @@ export default function Page() {
               for your app
             </h1>
             <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
-              Build intelligent applications with Edgecraft’s local components + Cloudflare Workers AI,
+              Build intelligent applications with EdgePilot's local components + Cloudflare Workers AI,
               delivering fast, scalable AI experiences at the edge.
             </p>
             <div className="flex items-center justify-center space-x-4">
@@ -98,13 +98,13 @@ export default function Page() {
                 <div className="flex items-center gap-3">
                   <span className="text-xs text-gray-500">TypeScript</span>
                   <CopyButton
-                    text={`import { createNextHandler } from '@edgecraft/copilotkit-workers-ai';\n\nexport const runtime = 'edge';\n\nexport const POST = createNextHandler({\n  apiKey: process.env.CLOUDFLARE_API_TOKEN,\n  accountId: process.env.CLOUDFLARE_ACCOUNT_ID,\n  model: '@cf/meta/llama-3.1-70b-instruct',\n  stream: true,\n  cache: false,\n});`}
+                    text={`import { createNextHandler } from 'edgepilot';\n\nexport const runtime = 'edge';\n\nexport const POST = createNextHandler({\n  apiKey: process.env.CLOUDFLARE_API_TOKEN,\n  accountId: process.env.CLOUDFLARE_ACCOUNT_ID,\n  model: '@cf/meta/llama-3.1-70b-instruct',\n  stream: true,\n  cache: false,\n});`}
                   />
                 </div>
               </div>
               <pre className="p-6 text-sm overflow-x-auto">
                 <code className="language-typescript text-gray-300">
-{`import { createNextHandler } from '@edgecraft/copilotkit-workers-ai';
+{`import { createNextHandler } from 'edgepilot';
 
 export const runtime = 'edge';
 
@@ -126,7 +126,7 @@ export const POST = createNextHandler({
       <section id="features" className="py-20 px-6 border-t border-gray-800">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Why developers love Edgecraft</h2>
+            <h2 className="text-4xl font-bold mb-4">Why developers love EdgePilot</h2>
             <p className="text-xl text-gray-400">Everything you need to build AI-powered applications</p>
           </div>
 
@@ -203,7 +203,7 @@ export const POST = createNextHandler({
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-pink-500 rounded-lg" />
-                <span className="text-xl font-bold">CopilotEdge</span>
+                <span className="text-xl font-bold">EdgePilot</span>
               </div>
               <p className="text-gray-400 text-sm">
                 AI-powered applications at the edge
@@ -240,7 +240,7 @@ export const POST = createNextHandler({
           
           <div className="pt-8 border-t border-gray-800 flex items-center justify-between">
             <p className="text-gray-400 text-sm">
-              © {new Date().getFullYear()} CopilotEdge. All rights reserved.
+              © {new Date().getFullYear()} EdgePilot. All rights reserved.
             </p>
             <div className="flex items-center space-x-4">
              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="text-gray-400 hover:text-white transition-colors">
