@@ -2,7 +2,7 @@
 
 Zero cold-start AI at the edge with Cloudflare Workers AI for Next.js applications.
 
-📚 **[Documentation](https://edgepilot.dev)** | 🎯 **[Examples](https://github.com/edgepilot/edgepilot/tree/main/examples)** | 💬 **[Discord](https://edgepilot.dev/discord)**
+🎯 **[Examples](https://github.com/edgepilot/edgepilot/tree/main/examples)** | 📚 **[Docs](https://github.com/edgepilot/edgepilot#readme)** | 🌐 **[edgepilot.dev](https://edgepilot.dev)** (coming soon)
 
 ## Features
 
