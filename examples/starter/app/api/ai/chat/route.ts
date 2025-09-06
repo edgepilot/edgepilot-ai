@@ -3,13 +3,15 @@ import { createNextHandler } from 'edgepilot/next';
 
 export const runtime = 'edge';
 
-// Create the handler with default model
-const handler = createNextHandler({
-  model: process.env.EDGEPILOT_MODEL || '@cf/meta/llama-3.1-8b-instruct',
-  stream: true,
-  cache: false,
-  debug: process.env.NODE_ENV !== 'production'
-});
+// Create the handler with default model (skip if no API key during build)
+const handler = process.env.CLOUDFLARE_API_TOKEN 
+  ? createNextHandler({
+      model: process.env.EDGEPILOT_MODEL || '@cf/meta/llama-3.1-8b-instruct',
+      stream: true,
+      cache: false,
+      debug: process.env.NODE_ENV !== 'production'
+    })
+  : async () => new Response('API not configured', { status: 503 });
 
 // Export the POST handler
 export const POST = handler;

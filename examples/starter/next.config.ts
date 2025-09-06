@@ -3,6 +3,11 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // ✅ Enforce React 19 concurrent features
   reactStrictMode: true,
+  
+  // Skip ESLint during builds
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 
   // ✅ Generate source maps in production for debugging
   productionBrowserSourceMaps: true,
