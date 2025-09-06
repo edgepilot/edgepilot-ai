@@ -212,7 +212,7 @@ export const POST = createNextHandler({
             
             <div>
               <h3 className="font-semibold mb-4">Product</h3>
-              <ul className="space-y-2 text-gray-400 text-sm" role="list">
+              <ul className="space-y-2 text-gray-400 text-sm">
                  <li><Link href="/#features" className="hover:text-white transition-colors">Features</Link></li>
                 <li><Link href="/" className="hover:text-white transition-colors">Pricing</Link></li>
                 <li><Link href="/" className="hover:text-white transition-colors">Changelog</Link></li>
@@ -221,7 +221,7 @@ export const POST = createNextHandler({
             
             <div>
               <h3 className="font-semibold mb-4">Resources</h3>
-              <ul className="space-y-2 text-gray-400 text-sm" role="list">
+              <ul className="space-y-2 text-gray-400 text-sm">
                  <li><Link href="/" className="hover:text-white transition-colors">Documentation</Link></li>
                 <li><Link href="/" className="hover:text-white transition-colors">API Reference</Link></li>
                 <li><Link href="/#code" className="hover:text-white transition-colors">Examples</Link></li> 
@@ -230,7 +230,7 @@ export const POST = createNextHandler({
             
             <div>
               <h3 className="font-semibold mb-4">Company</h3>
-              <ul className="space-y-2 text-gray-400 text-sm" role="list">
+              <ul className="space-y-2 text-gray-400 text-sm">
                  <li><Link href="/" className="hover:text-white transition-colors">About</Link></li>
                 <li><Link href="/" className="hover:text-white transition-colors">Blog</Link></li>
                 <li><Link href="/" className="hover:text-white transition-colors">Contact</Link></li> 
