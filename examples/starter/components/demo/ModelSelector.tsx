@@ -97,9 +97,15 @@ export default function ModelSelector({ selectedModel, onModelChange }: ModelSel
         </svg>
       </button>
 
-      {isOpen && (
+      {isOpen ? (
         <>
-          <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
+          <div 
+            className="fixed inset-0 z-10" 
+            onClick={() => setIsOpen(false)}
+            onKeyDown={(e) => { if (e.key === 'Escape') setIsOpen(false); }}
+            role="button"
+            tabIndex={0}
+            aria-label="Close dropdown" />
           <div className="absolute top-full left-0 right-0 mt-1 bg-gray-900 border border-gray-700 rounded-lg shadow-lg z-20 max-h-96 overflow-y-auto">
             <div className="p-2">
               {models.map((model) => (
@@ -140,7 +146,7 @@ export default function ModelSelector({ selectedModel, onModelChange }: ModelSel
             </div>
           </div>
         </>
-      )}
+      ) : null}
     </div>
   );
 }
