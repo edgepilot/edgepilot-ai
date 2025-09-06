@@ -162,9 +162,15 @@ export default function ChatPopup() {
       </button>
 
       {/* Modal */}
-      {open && (
+      {open ? (
         <div className="fixed inset-0 z-50">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setOpen(false)} />
+          <div 
+            className="absolute inset-0 bg-black/50" 
+            onClick={() => setOpen(false)}
+            onKeyDown={(e) => { if (e.key === 'Escape') setOpen(false); }}
+            role="button"
+            tabIndex={0}
+            aria-label="Close chat" />
           <div
             className="absolute right-4 bottom-20 z-50 w-[420px] max-w-[95vw] rounded-lg border border-gray-800 bg-black text-gray-100 shadow-2xl"
             role="dialog"
@@ -250,7 +256,7 @@ export default function ChatPopup() {
                   <span className="whitespace-pre-wrap">{m.content}</span>
                 </div>
               ))}
-              {loading && <div className="text-gray-400 text-sm italic">Thinking...</div>}
+              {loading ? <div className="text-gray-400 text-sm italic">Thinking...</div> : null}
             </div>
 
             {/* Config Panel */}
@@ -281,7 +287,6 @@ export default function ChatPopup() {
                     value={temperature}
                     onChange={(e) => setTemperature(Number(e.target.value))}
                     className="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
-                    role="slider"
                     aria-valuenow={temperature}
                     aria-valuemin={0}
                     aria-valuemax={2}
@@ -292,11 +297,11 @@ export default function ChatPopup() {
             </details>
 
             {/* Composer */}
-            {emptyNotice && (
+            {emptyNotice ? (
               <div role="status" aria-live="polite" className="px-3 pb-3 -mt-2 text-xs text-rose-300">
                 {emptyNotice}
               </div>
-            )}
+            ) : null}
             <form onSubmit={handleSubmit} className="p-3 border-t border-gray-800">
               <div id={inputHintId} className="sr-only">Chat with AI. Press Enter to send or Shift+Enter for new line.</div>
               <div className="flex gap-2">
@@ -348,7 +353,7 @@ export default function ChatPopup() {
             </form>
           </div>
         </div>
-      )}
+      ) : null}
     </>
   );
 }
