@@ -72,7 +72,7 @@ export default function Page() {
               for your app
             </h1>
             <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
-              Build intelligent applications with EdgePilot's local components + Cloudflare Workers AI,
+              Build intelligent applications with EdgePilot&apos;s local components + Cloudflare Workers AI,
               delivering fast, scalable AI experiences at the edge.
             </p>
             <div className="flex items-center justify-center space-x-4">
@@ -138,7 +138,7 @@ export const POST = createNextHandler({
                 </svg>
               </div>
               <h3 className="text-xl font-semibold mb-2">Lightning Fast</h3>
-              <p className="text-gray-400">Powered by Cloudflare's global edge network for ultra-low latency AI responses</p>
+              <p className="text-gray-400">Powered by Cloudflare&apos;s global edge network for ultra-low latency AI responses</p>
             </div>
 
             <div className="p-6 bg-gray-900/50 rounded-lg border border-gray-800 hover:border-gray-700 transition-colors">
