@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { devtools } from 'zustand';
+// eslint-disable-next-line no-restricted-imports
+import { devtools } from 'zustand/middleware';
 
 interface HomePageStore {
   // Model selection
