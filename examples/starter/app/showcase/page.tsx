@@ -24,7 +24,7 @@ export default function Page() {
                   <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-pink-500 rounded-lg" />
                   <span className="text-xl font-bold">EdgePilot</span>
                 </div>
-                <ul className="hidden md:flex items-center gap-6" role="list">
+                <ul className="hidden md:flex items-center gap-6">
                   <li>
                     <Link href="/" className="text-gray-300 hover:text-white transition-colors">
                       Home
