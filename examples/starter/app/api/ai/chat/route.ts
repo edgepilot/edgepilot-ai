@@ -1,5 +1,5 @@
-// Import from the copilotedge package
-import { createNextHandler } from 'copilotedge/next';
+// Import from the edgepilot package
+import { createNextHandler } from 'edgepilot/next';
 
 export const runtime = 'edge';
 

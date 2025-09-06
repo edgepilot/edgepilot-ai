@@ -1,5 +1,5 @@
 {
-  "name": "copilotedge-starter-example",
+  "name": "edgepilot-starter-example",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "copilotedge": "file:../..",
+    "edgepilot": "file:../..",
     "@tanstack/react-query": "^5.85.6",
     "@tanstack/react-query-devtools": "^5.85.6",
     "next": "15.4.6",

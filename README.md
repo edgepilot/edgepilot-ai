@@ -1,4 +1,4 @@
-# CopilotEdge
+# EdgePilot
 
 Zero cold-start AI at the edge with Cloudflare Workers AI for Next.js applications.
 
@@ -14,11 +14,11 @@ Zero cold-start AI at the edge with Cloudflare Workers AI for Next.js applicatio
 ## Installation
 
 ```bash
-npm install copilotedge
+npm install edgepilot
 # or
-pnpm add copilotedge
+pnpm add edgepilot
 # or
-yarn add copilotedge
+yarn add edgepilot
 ```
 
 ## Quick Start
@@ -37,7 +37,7 @@ CLOUDFLARE_ACCOUNT_ID=your-account-id
 Create `app/api/ai/chat/route.ts`:
 
 ```typescript
-import { createNextHandler } from 'copilotedge/next';
+import { createNextHandler } from 'edgepilot/next';
 
 export const runtime = 'edge';
 
@@ -73,7 +73,7 @@ export function ChatComponent() {
 
 ## Available Models
 
-CopilotEdge supports all Cloudflare Workers AI models:
+EdgePilot supports all Cloudflare Workers AI models:
 
 - `@cf/meta/llama-3.3-70b-instruct` - Meta's latest 70B model
 - `@cf/meta/llama-3.1-8b-instruct` - Fast lightweight model

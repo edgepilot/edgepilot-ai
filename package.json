@@ -1,7 +1,7 @@
 {
-  "name": "copilotedge",
+  "name": "edgepilot",
   "version": "0.1.0",
-  "description": "Cloudflare Workers AI integration for Next.js - Zero cold start AI at the edge",
+  "description": "AI assistant components for Cloudflare Workers - pilot your edge AI",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -47,12 +47,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/copilotedge.git"
+    "url": "https://github.com/edgepilot/edgepilot.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/copilotedge/issues"
+    "url": "https://github.com/edgepilot/edgepilot/issues"
   },
-  "homepage": "https://github.com/yourusername/copilotedge#readme",
+  "homepage": "https://edgepilot.dev",
   "devDependencies": {
     "@types/node": "^20",
     "typescript": "^5",

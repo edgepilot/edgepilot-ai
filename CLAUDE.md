@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with the **copilotedge** package.
+This file provides guidance to Claude Code (claude.ai/code) when working with the **edgepilot** package.
 
 ## PROJECT STATUS: Ready to Publish! 🚀
 
@@ -9,7 +9,7 @@ Claude Code has successfully refactored this into a single npm package. The stru
 ## Current Structure
 
 ```
-copilotedge-starter/            # Main package root (will rename to copilotedge)
+edgepilot/                      # Main package root
 ├── src/                        # All source code (consolidated)
 │   ├── index.ts               # Main exports
 │   ├── next.ts                # Next.js handler
@@ -21,7 +21,7 @@ copilotedge-starter/            # Main package root (will rename to copilotedge)
 │   └── starter/               # Demo Next.js app
 │       ├── package.json       # Separate package.json for demo
 │       └── [demo app files]
-├── package.json               # Single package.json for copilotedge
+├── package.json               # Single package.json for edgepilot
 ├── tsconfig.json
 └── README.md
 ```
@@ -45,7 +45,7 @@ npm publish      # Publish to npm (from root)
 
 ## What This Package Does
 
-**copilotedge** provides Cloudflare Workers AI integration for Next.js and React apps:
+**edgepilot** provides Cloudflare Workers AI integration for Next.js and React apps:
 - Zero cold-start AI at the edge
 - Reduces AI costs by using Cloudflare's edge network
 - Provides streaming, caching, and automatic retries
@@ -65,7 +65,7 @@ CLOUDFLARE_ACCOUNT_ID=your-account   # Cloudflare account ID
 Before running `npm publish`, verify:
 
 ### 1. Package.json Essentials
-- [x] Name: `copilotedge`
+- [x] Name: `edgepilot`
 - [x] Version: `0.1.0`
 - [x] Description is clear
 - [x] Main and types point to dist/
@@ -114,7 +114,7 @@ npm publish --dry-run
 npm publish
 
 # 4. Verify it worked
-npm view copilotedge
+npm view edgepilot
 ```
 
 ## Available AI Models
@@ -176,7 +176,7 @@ That's it. Everything else is iteration.
 Creates a Next.js API route handler for AI chat endpoints.
 
 ```typescript
-import { createNextHandler } from 'copilotedge/next';
+import { createNextHandler } from 'edgepilot/next';
 
 export const runtime = 'edge';
 
