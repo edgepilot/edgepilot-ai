@@ -1,10 +1,10 @@
 {
   "name": "edgepilot",
   "version": "0.1.0",
-  "description": "AI assistant components for Cloudflare Workers - pilot your edge AI",
+  "description": "React AI assistant components powered by Cloudflare Workers",
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -33,22 +33,15 @@
   "keywords": [
     "cloudflare",
     "workers-ai",
-    "nextjs",
-    "edge",
     "ai",
-    "llm",
-    "copilot",
-    "streaming",
-    "vercel",
-    "llama",
-    "mistral"
+    "assistant",
+    "react",
+    "edge",
+    "components"
   ],
   "author": "Audrey Klammer",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/edgepilot/edgepilot.git"
-  },
+  "repository": "https://github.com/edgepilot/edgepilot",
   "bugs": {
     "url": "https://github.com/edgepilot/edgepilot/issues"
   },
@@ -61,6 +54,7 @@
     "typescript": "^5"
   },
   "peerDependencies": {
+    "react": ">=18.0.0",
     "next": ">=13.4"
   },
   "peerDependenciesMeta": {
