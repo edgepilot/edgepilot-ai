@@ -171,6 +171,7 @@ export default function ChatPopup() {
             role="button"
             tabIndex={0}
             aria-label="Close chat" />
+          {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
           <div
             className="absolute right-4 bottom-20 z-50 w-[420px] max-w-[95vw] rounded-lg border border-gray-800 bg-black text-gray-100 shadow-2xl"
             role="dialog"
@@ -180,7 +181,6 @@ export default function ChatPopup() {
             id={dialogId}
             ref={dialogRef}
             tabIndex={-1}
-            onClick={(e) => e.stopPropagation()}
             onKeyDown={(e) => {
               if (e.key !== 'Tab') return;
               // Improved focus trap with proper else-if
