@@ -21,7 +21,7 @@ edgepilot/                      # Main package root
 │   └── starter/               # Demo Next.js app
 │       ├── package.json       # Separate package.json for demo
 │       └── [demo app files]
-├── package.json               # Single package.json for edgepilot
+├── package.json               # Single package.json for edgepilot-ai
 ├── tsconfig.json
 └── README.md
 ```
@@ -114,7 +114,7 @@ npm publish --dry-run
 npm publish
 
 # 4. Verify it worked
-npm view edgepilot
+npm view edgepilot-ai
 ```
 
 ## Available AI Models

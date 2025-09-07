@@ -1,4 +1,4 @@
-# EdgePilot Starter Example
+# EdgePilot AI Starter Example
 
 A Next.js application demonstrating EdgePilot's AI assistant capabilities powered by Cloudflare Workers.
 

@@ -1,4 +1,4 @@
-# EdgePilot
+# EdgePilot AI
 
 [![npm version](https://img.shields.io/npm/v/edgepilot-ai.svg)](https://www.npmjs.com/package/edgepilot-ai)
 [![npm downloads](https://img.shields.io/npm/dm/edgepilot-ai.svg)](https://www.npmjs.com/package/edgepilot-ai)

@@ -20,7 +20,7 @@ const nextConfig: NextConfig = {
     optimizePackageImports: [
       "@tanstack/react-query",
       "zustand",
-      "edgepilot"
+      "edgepilot-ai"
     ],
   },
 
@@ -69,7 +69,7 @@ const nextConfig: NextConfig = {
   //   return [
   //     {
   //       source: "/docs",
-  //       destination: "https://github.com/edgepilot/edgepilot/wiki",
+  //       destination: "https://github.com/edgepilot/edgepilot-ai/wiki",
   //       permanent: false,
   //     },
   //   ];
