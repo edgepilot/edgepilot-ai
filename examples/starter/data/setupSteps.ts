@@ -9,7 +9,7 @@ export interface SetupStep {
 export const setupSteps: SetupStep[] = [
   {
     title: "Get Your Cloudflare Credentials",
-    description: "You'll need a Cloudflare API token and Account ID to use Workers AI with the EdgePilot connector.",
+    description: "You'll need a Cloudflare API token and Account ID to use Workers AI with the EdgePilot AI connector.",
     instructions: [
       'Go to <a href="https://dash.cloudflare.com/profile/api-tokens" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:underline">Cloudflare Dashboard</a>',
       'Create a new API token with "Workers AI" permissions',
@@ -32,7 +32,7 @@ CLOUDFLARE_ACCOUNT_ID=your-account-id-here
   },
   {
     title: "Test Your Setup",
-    description: "Restart the dev server. In the popup header you can switch provider (Cloudflare/OpenAI). The app uses the EdgePilot API at `/api/ai/chat`.",
+    description: "Restart the dev server. In the popup header you can switch provider (Cloudflare/OpenAI). The app uses the EdgePilot AI API at `/api/ai/chat`.",
     code: `# Restart your dev server
 npm run dev
 # or
