@@ -23,7 +23,7 @@ export async function GET() {
   const { ok, missing } = validateEnv();
   const body = {
     ok,
-    service: 'edgepilot',
+    service: 'edgepilot-ai',
     version: process.env.NEXT_PUBLIC_APP_VERSION ?? 'dev',
     runtime: 'edge',
     env: ok ? 'ok' : 'missing',
