@@ -7,7 +7,7 @@ Backend API handlers for Cloudflare Workers AI integration in Next.js and Edge R
 
 > **Looking for React components?** Check out [edgepilot-ui](https://www.npmjs.com/package/edgepilot-ui) for pre-built chat interfaces and components.
 
-🎯 **[Examples](https://github.com/edgepilot/edgepilot/tree/main/examples)** | 📚 **[Docs](https://github.com/edgepilot/edgepilot#readme)** | 🌐 **[edgepilot.dev](https://edgepilot.dev)** (coming soon)
+🎯 **[Examples](https://github.com/edgepilot/edgepilot-ai/tree/main/examples)** | 📚 **[Docs](https://github.com/edgepilot/edgepilot-ai#readme)** | 🌐 **[edgepilot.dev](https://edgepilot.dev)** (coming soon)
 
 ## What is EdgePilot?
 
@@ -49,7 +49,7 @@ yarn add edgepilot-ai
 
 ## Quick Start
 
-This package provides the **backend API handlers**. For a complete example with UI components, see our [starter example](https://github.com/edgepilot/edgepilot/tree/main/examples/starter).
+This package provides the **backend API handlers**. For a complete example with UI components, see our [starter example](https://github.com/edgepilot/edgepilot-ai/tree/main/examples/starter).
 
 ### 1. Set up environment variables
 

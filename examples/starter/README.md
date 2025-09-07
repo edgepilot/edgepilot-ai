@@ -36,6 +36,6 @@ CLOUDFLARE_ACCOUNT_ID=your_cloudflare_account_id
 
 ## Learn More
 
-- [EdgePilot Documentation](https://github.com/edgepilot/edgepilot)
+- [EdgePilot Documentation](https://github.com/edgepilot/edgepilot-ai)
 - [Cloudflare Workers AI](https://developers.cloudflare.com/workers-ai/)
 - [Next.js Documentation](https://nextjs.org/docs)

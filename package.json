@@ -45,9 +45,9 @@
   ],
   "author": "Audrey Klammer",
   "license": "MIT",
-  "repository": "https://github.com/edgepilot/edgepilot",
+  "repository": "https://github.com/edgepilot/edgepilot-ai",
   "bugs": {
-    "url": "https://github.com/edgepilot/edgepilot/issues"
+    "url": "https://github.com/edgepilot/edgepilot-ai/issues"
   },
   "homepage": "https://edgepilot.dev",
   "devDependencies": {
