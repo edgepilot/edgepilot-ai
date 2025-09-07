@@ -4,4 +4,3 @@ export { createFetchHandler } from './fetch';
 
 // Register the Cloudflare driver on import
 import './driver';
-
