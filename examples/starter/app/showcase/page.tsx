@@ -98,13 +98,13 @@ export default function Page() {
                 <div className="flex items-center gap-3">
                   <span className="text-xs text-gray-500">TypeScript</span>
                   <CopyButton
-                    text={`import { createNextHandler } from 'edgepilot';\n\nexport const runtime = 'edge';\n\nexport const POST = createNextHandler({\n  apiKey: process.env.CLOUDFLARE_API_TOKEN,\n  accountId: process.env.CLOUDFLARE_ACCOUNT_ID,\n  model: '@cf/meta/llama-3.1-70b-instruct',\n  stream: true,\n  cache: false,\n});`}
+                    text={`import { createNextHandler } from 'edgepilot-ai';\n\nexport const runtime = 'edge';\n\nexport const POST = createNextHandler({\n  apiKey: process.env.CLOUDFLARE_API_TOKEN,\n  accountId: process.env.CLOUDFLARE_ACCOUNT_ID,\n  model: '@cf/meta/llama-3.1-70b-instruct',\n  stream: true,\n  cache: false,\n});`}
                   />
                 </div>
               </div>
               <pre className="p-6 text-sm overflow-x-auto">
                 <code className="language-typescript text-gray-300">
-{`import { createNextHandler } from 'edgepilot';
+{`import { createNextHandler } from 'edgepilot-ai';
 
 export const runtime = 'edge';
 

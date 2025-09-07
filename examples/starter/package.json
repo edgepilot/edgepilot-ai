@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "edgepilot": "file:../..",
+    "edgepilot-ai": "file:../..",
     "@tanstack/react-query": "^5.85.6",
     "@tanstack/react-query-devtools": "^5.85.6",
     "next": "15.4.6",

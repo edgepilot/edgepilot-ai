@@ -1,7 +1,7 @@
 # EdgePilot
 
-[![npm version](https://img.shields.io/npm/v/edgepilot.svg)](https://www.npmjs.com/package/edgepilot)
-[![npm downloads](https://img.shields.io/npm/dm/edgepilot.svg)](https://www.npmjs.com/package/edgepilot)
+[![npm version](https://img.shields.io/npm/v/edgepilot-ai.svg)](https://www.npmjs.com/package/edgepilot-ai)
+[![npm downloads](https://img.shields.io/npm/dm/edgepilot-ai.svg)](https://www.npmjs.com/package/edgepilot-ai)
 
 Backend API handlers for Cloudflare Workers AI integration in Next.js and Edge Runtime applications.
 
@@ -40,11 +40,11 @@ Want pre-built components? Check out `edgepilot-ui`!
 ## Installation
 
 ```bash
-npm install edgepilot
+npm install edgepilot-ai
 # or
-pnpm add edgepilot
+pnpm add edgepilot-ai
 # or
-yarn add edgepilot
+yarn add edgepilot-ai
 ```
 
 ## Quick Start
@@ -65,7 +65,7 @@ CLOUDFLARE_ACCOUNT_ID=your-account-id
 Create `app/api/ai/chat/route.ts`:
 
 ```typescript
-import { createNextHandler } from 'edgepilot/next';
+import { createNextHandler } from 'edgepilot-ai/next';
 
 export const runtime = 'edge';
 
@@ -164,7 +164,7 @@ EdgePilot is part of a modular ecosystem:
 
 | Package | Description | Status |
 |---------|-------------|--------|
-| **edgepilot** | Backend API handlers for Cloudflare Workers AI | ✅ Available |
+| **edgepilot-ai** | Backend API handlers for Cloudflare Workers AI | ✅ Available |
 | **edgepilot-ui** | Pre-built React components (ChatPopup, ModelSelector, etc.) | 🚧 Coming Soon |
 | **create-edgepilot** | CLI to scaffold new projects | 📋 Planned |
 

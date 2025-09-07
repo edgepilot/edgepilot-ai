@@ -1,5 +1,5 @@
-// Import from the edgepilot package
-import { createNextHandler } from 'edgepilot/next';
+// Import from the edgepilot-ai package
+import { createNextHandler } from 'edgepilot-ai/next';
 
 export const runtime = 'edge';
 

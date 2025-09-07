@@ -1,5 +1,5 @@
 {
-  "name": "edgepilot",
+  "name": "edgepilot-ai",
   "version": "0.1.0",
   "description": "Cloudflare Workers AI integration for Next.js and Edge Runtime",
   "type": "module",
