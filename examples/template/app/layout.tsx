@@ -1,4 +1,5 @@
 import "./globals.css";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 export const metadata = {
   title: 'EdgePilot AI App',
@@ -9,7 +10,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className="antialiased">
-        {children}
+        <ErrorBoundary>
+          {children}
+        </ErrorBoundary>
       </body>
     </html>
   );

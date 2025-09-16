@@ -1,6 +1,26 @@
 import { Message } from './types';
 
 /**
+ * API response structure from providers
+ */
+export interface ProviderResponse {
+  response?: string;
+  result?: {
+    response: string;
+  };
+  choices?: Array<{
+    delta?: {
+      content?: string;
+    };
+    message?: {
+      role: string;
+      content: string;
+    };
+    finish_reason?: string;
+  }>;
+}
+
+/**
  * Streaming response utilities for processing Server-Sent Events
  */
 
@@ -107,22 +127,53 @@ export async function createStreamingResponse(
 }
 
 /**
+ * Standard API response format
+ */
+export interface ApiResponse {
+  id: string;
+  object: string;
+  created: number;
+  model: string;
+  choices: Array<{
+    index: number;
+    message?: { role: string; content: string };
+    finish_reason: string;
+  }>;
+  usage?: {
+    prompt_tokens: number;
+    completion_tokens: number;
+    total_tokens: number;
+  };
+  cached?: boolean;
+}
+
+/**
  * Transforms a non-streaming response into the expected format
  */
-export function transformNormalResponse(data: any, model: string): any {
+export function transformNormalResponse(data: ProviderResponse, model: string): ApiResponse {
+  // Transform provider choices to our format
+  const choices = data.choices?.map((choice, index) => ({
+    index,
+    message: choice.message || {
+      role: 'assistant',
+      content: choice.delta?.content || data.result?.response || data.response || 'No response'
+    },
+    finish_reason: choice.finish_reason || 'stop'
+  })) || [{
+    index: 0,
+    message: {
+      role: 'assistant',
+      content: data.result?.response || data.response || 'No response'
+    },
+    finish_reason: 'stop'
+  }];
+
   return {
     id: `chat-${Date.now()}`,
     object: 'chat.completion',
     created: Math.floor(Date.now() / 1000),
     model,
-    choices: data.choices || [{
-      index: 0,
-      message: {
-        role: 'assistant',
-        content: data.result?.response || data.response || 'No response'
-      },
-      finish_reason: 'stop'
-    }],
+    choices,
     usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 }
   };
 }

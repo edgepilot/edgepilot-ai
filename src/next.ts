@@ -2,36 +2,42 @@ import { NextResponse } from 'next/server';
 import { Role, Message, Config, HttpError } from './core/types';
 import { validateRequestBody } from './core/validation';
 import { secureLog, SimpleRateLimit, getClientIdentifier, validateEnvironmentSecurity } from './core/security';
-import { createStreamingResponse, transformNormalResponse } from './core/streaming';
+import { createStreamingResponse, transformNormalResponse, ApiResponse } from './core/streaming';
 import { ProviderManager } from './core/providers';
 import { resolveConfig, validateConfig } from './core/config';
-
-/**
- * Simple cache implementation for response caching
- */
-class SimpleCache<T = unknown> {
-  private cache = new Map<string, { data: T; expires: number }>();
-
-  get(key: string): T | null {
-    const item = this.cache.get(key);
-    if (!item || Date.now() > item.expires) {
-      this.cache.delete(key);
-      return null;
-    }
-    return item.data;
-  }
-
-  set(key: string, data: T, ttl = 60_000) {
-    this.cache.set(key, { data, expires: Date.now() + ttl });
-  }
-
-  clear() {
-    this.cache.clear();
-  }
-}
+import { ResponseCache } from './core/cache';
 
 /**
  * Creates a Next.js API route handler for EdgePilot AI
+ *
+ * This function creates a fully-featured AI chat handler with:
+ * - Automatic rate limiting (100 requests/minute)
+ * - Input validation and sanitization
+ * - Multi-provider support (Cloudflare AI + OpenAI fallback)
+ * - Response caching with memory management
+ * - Streaming and non-streaming responses
+ * - Comprehensive error handling
+ * - Security features and environment validation
+ *
+ * @param userConfig - Configuration options to override defaults
+ * @returns A Next.js API route handler function for POST requests
+ *
+ * @example
+ * ```typescript
+ * // app/api/ai/chat/route.ts
+ * import { createNextHandler } from 'edgepilot-ai/next';
+ *
+ * export const runtime = 'edge';
+ *
+ * const handler = createNextHandler({
+ *   model: '@cf/meta/llama-3.1-8b-instruct',
+ *   stream: true,
+ *   cache: true,
+ *   debug: process.env.NODE_ENV !== 'production'
+ * });
+ *
+ * export const POST = handler;
+ * ```
  */
 export function createNextHandler(userConfig: Config = {}) {
   // Resolve and validate configuration
@@ -39,7 +45,7 @@ export function createNextHandler(userConfig: Config = {}) {
   validateConfig(config);
 
   // Initialize core services
-  const cache = config.cache ? new SimpleCache<any>() : undefined;
+  const cache = config.cache ? new ResponseCache() : undefined;
   const rateLimit = new SimpleRateLimit(100, 60000); // 100 requests per minute
   const providerManager = new ProviderManager({
     cloudflareApiKey: config.apiKey,
@@ -83,14 +89,14 @@ export function createNextHandler(userConfig: Config = {}) {
     model: string,
     providerOverride?: string,
     temperature?: number
-  ): Promise<any> {
-    const cacheKey = cache ? JSON.stringify({ messages, model, temperature }) : null;
+  ): Promise<ApiResponse> {
+    const cacheKey = cache ? ResponseCache.generateKey({ messages, model, temperature }) : null;
 
     // Check cache first
     if (cacheKey && cache) {
       const hit = cache.get(cacheKey);
       if (hit) {
-        return { ...(hit as any), cached: true };
+        return { ...hit, cached: true };
       }
     }
 
@@ -104,7 +110,7 @@ export function createNextHandler(userConfig: Config = {}) {
     });
 
     const data = await response.json();
-    const result = transformNormalResponse(data, model);
+    const result = transformNormalResponse(data, model) as ApiResponse;
 
     // Cache the result
     if (cacheKey && cache) {
@@ -123,7 +129,7 @@ export function createNextHandler(userConfig: Config = {}) {
     model?: string;
     temperature?: number;
     provider?: string;
-  }): Promise<Response | any> {
+  }): Promise<Response | ApiResponse> {
     const {
       messages,
       stream,
