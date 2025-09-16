@@ -1,11 +1,4 @@
-type Role = 'system' | 'user' | 'assistant' | string;
-type Message = { role: Role; content: string };
-
-type Config = {
-  apiKey?: string;
-  accountId?: string;
-  model?: string;
-};
+import { Role, Message, Config } from './core/types';
 
 export function createFetchHandler(config: Config) {
   const apiKey = config?.apiKey || process.env.CLOUDFLARE_API_TOKEN || '';

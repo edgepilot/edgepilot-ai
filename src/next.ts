@@ -1,27 +1,5 @@
 import { NextResponse } from 'next/server';
-
-type Role = 'system' | 'user' | 'assistant' | string;
-type Message = { role: Role; content: string };
-
-type Config = {
-  apiKey?: string;
-  accountId?: string;
-  model?: string;
-  stream?: boolean;
-  debug?: boolean;
-  cache?: boolean;
-  maxRetries?: number;
-};
-
-class HttpError extends Error {
-  status: number;
-  publicMessage: string;
-  constructor(status: number, publicMessage: string, debugMessage?: string) {
-    super(debugMessage || publicMessage);
-    this.status = status;
-    this.publicMessage = publicMessage;
-  }
-}
+import { Role, Message, Config, HttpError } from './core/types';
 
 class SimpleCache<T = unknown> {
   private cache = new Map<string, { data: T; expires: number }>();
