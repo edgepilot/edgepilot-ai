@@ -58,3 +58,18 @@ next-env.d.ts
 
 # Vercel
 .vercel
+
+# NPM
+.npmrc
+
+# CI/CD
+.github/workflows/*.log
+scripts/*.log
+
+# Internal development docs
+*_REPORT.md
+*_SUMMARY.md
+*_QUICK_FIX.md
+IMPLEMENTATION*.md
+reliability-tests.js
+run-tests.js
