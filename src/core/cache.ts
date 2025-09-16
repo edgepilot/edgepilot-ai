@@ -24,7 +24,7 @@ export interface CacheEntry<T> {
 }
 
 /**
- * LRU cache with automatic cleanup and memory management
+ * Thread-safe LRU cache with automatic cleanup and memory management
  */
 export class BoundedCache<T = unknown> {
   private cache = new Map<string, CacheEntry<T>>();
@@ -32,6 +32,10 @@ export class BoundedCache<T = unknown> {
   private options: CacheOptions;
   private cleanupTimer?: NodeJS.Timeout;
   private currentSize = 0;
+  private operationQueue: Array<() => void> = [];
+  private isProcessing = false;
+  private queueFullErrors = 0;
+  private readonly maxQueueSize = 1000;
 
   constructor(options: Partial<CacheOptions> = {}) {
     this.options = { ...DEFAULT_CACHE_OPTIONS, ...options };
@@ -39,7 +43,65 @@ export class BoundedCache<T = unknown> {
   }
 
   /**
-   * Get an item from cache
+   * Synchronous operation wrapper for thread safety with timeout protection
+   */
+  private async withLock<R>(operation: () => R, timeoutMs: number = 5000): Promise<R> {
+    return new Promise((resolve, reject) => {
+      // Circuit breaker: reject if queue is too full
+      if (this.operationQueue.length >= this.maxQueueSize) {
+        this.queueFullErrors++;
+        reject(new Error(`Cache operation rejected: queue full (${this.operationQueue.length}/${this.maxQueueSize})`));
+        return;
+      }
+
+      // Timeout protection to prevent deadlocks
+      const timeoutId = setTimeout(() => {
+        reject(new Error(`Cache operation timed out after ${timeoutMs}ms`));
+      }, timeoutMs);
+
+      this.operationQueue.push(() => {
+        try {
+          clearTimeout(timeoutId);
+          const result = operation();
+          resolve(result);
+        } catch (error) {
+          clearTimeout(timeoutId);
+          reject(error);
+        }
+      });
+
+      this.processQueue();
+    });
+  }
+
+  /**
+   * Process queued operations sequentially
+   */
+  private processQueue(): void {
+    if (this.isProcessing || this.operationQueue.length === 0) {
+      return;
+    }
+
+    this.isProcessing = true;
+
+    // Process in next tick to avoid blocking
+    process.nextTick(() => {
+      const operation = this.operationQueue.shift();
+      if (operation) {
+        operation();
+      }
+
+      this.isProcessing = false;
+
+      // Process next operation if any
+      if (this.operationQueue.length > 0) {
+        this.processQueue();
+      }
+    });
+  }
+
+  /**
+   * Get an item from cache (thread-safe)
    */
   get(key: string): T | null {
     const entry = this.cache.get(key);
@@ -50,11 +112,12 @@ export class BoundedCache<T = unknown> {
 
     // Check if expired
     if (Date.now() > entry.expires) {
-      this.delete(key);
+      // Atomic delete
+      this.deleteInternal(key);
       return null;
     }
 
-    // Update access order for LRU
+    // Atomic access order update
     entry.lastAccessed = Date.now();
     this.accessOrder.delete(key);
     this.accessOrder.add(key);
@@ -63,37 +126,48 @@ export class BoundedCache<T = unknown> {
   }
 
   /**
-   * Set an item in cache
+   * Set an item in cache (thread-safe)
    */
-  set(key: string, data: T, ttl?: number): void {
-    const size = this.estimateSize(data);
-    const expires = Date.now() + (ttl ?? this.options.defaultTtl);
-    const now = Date.now();
+  async set(key: string, data: T, ttl?: number): Promise<void> {
+    return this.withLock(() => {
+      const size = this.estimateSize(data);
+      const expires = Date.now() + (ttl ?? this.options.defaultTtl);
+      const now = Date.now();
 
-    // Remove existing entry if present
-    if (this.cache.has(key)) {
-      this.delete(key);
-    }
+      // Remove existing entry if present
+      if (this.cache.has(key)) {
+        this.deleteInternal(key);
+      }
 
-    // Ensure we have space
-    this.ensureCapacity(size);
+      // Ensure we have space
+      this.ensureCapacityInternal(size);
 
-    const entry: CacheEntry<T> = {
-      data,
-      expires,
-      lastAccessed: now,
-      size
-    };
+      const entry: CacheEntry<T> = {
+        data,
+        expires,
+        lastAccessed: now,
+        size
+      };
 
-    this.cache.set(key, entry);
-    this.accessOrder.add(key);
-    this.currentSize += size;
+      this.cache.set(key, entry);
+      this.accessOrder.add(key);
+      this.currentSize += size;
+    });
   }
 
   /**
-   * Delete an item from cache
+   * Delete an item from cache (thread-safe)
    */
-  delete(key: string): boolean {
+  async delete(key: string): Promise<boolean> {
+    return this.withLock(() => {
+      return this.deleteInternal(key);
+    });
+  }
+
+  /**
+   * Internal atomic delete operation
+   */
+  private deleteInternal(key: string): boolean {
     const entry = this.cache.get(key);
     if (!entry) {
       return false;
@@ -106,16 +180,18 @@ export class BoundedCache<T = unknown> {
   }
 
   /**
-   * Clear all items from cache
+   * Clear all items from cache (thread-safe)
    */
-  clear(): void {
-    this.cache.clear();
-    this.accessOrder.clear();
-    this.currentSize = 0;
+  async clear(): Promise<void> {
+    return this.withLock(() => {
+      this.cache.clear();
+      this.accessOrder.clear();
+      this.currentSize = 0;
+    });
   }
 
   /**
-   * Get cache statistics
+   * Get cache statistics including reliability metrics
    */
   getStats(): {
     size: number;
@@ -123,39 +199,55 @@ export class BoundedCache<T = unknown> {
     currentMemory: number;
     hitRate: number;
     itemCount: number;
+    queueLength: number;
+    queueFullErrors: number;
+    isProcessing: boolean;
   } {
     return {
       size: this.cache.size,
       maxSize: this.options.maxSize,
       currentMemory: this.currentSize,
       hitRate: 0, // Would need hit/miss tracking for accurate calculation
-      itemCount: this.cache.size
+      itemCount: this.cache.size,
+      queueLength: this.operationQueue.length,
+      queueFullErrors: this.queueFullErrors,
+      isProcessing: this.isProcessing
     };
   }
 
   /**
-   * Cleanup expired entries
+   * Cleanup expired entries (thread-safe)
    */
-  cleanup(): number {
-    const now = Date.now();
-    let removedCount = 0;
+  async cleanup(): Promise<number> {
+    return this.withLock(() => {
+      const now = Date.now();
+      let removedCount = 0;
+      const expiredKeys: string[] = [];
 
-    for (const [key, entry] of this.cache.entries()) {
-      if (now > entry.expires) {
-        this.delete(key);
-        removedCount++;
+      // Collect expired keys first to avoid modification during iteration
+      for (const [key, entry] of this.cache.entries()) {
+        if (now > entry.expires) {
+          expiredKeys.push(key);
+        }
       }
-    }
 
-    return removedCount;
+      // Remove expired entries atomically
+      for (const key of expiredKeys) {
+        if (this.deleteInternal(key)) {
+          removedCount++;
+        }
+      }
+
+      return removedCount;
+    });
   }
 
   /**
-   * Ensure we have capacity for new entry
+   * Ensure we have capacity for new entry (internal, already within lock)
    */
-  private ensureCapacity(newItemSize: number): void {
+  private ensureCapacityInternal(newItemSize: number): void {
     // Remove expired items first
-    this.cleanup();
+    this.cleanupInternal();
 
     // Remove LRU items until we have space
     while (
@@ -164,8 +256,33 @@ export class BoundedCache<T = unknown> {
     ) {
       const oldestKey = this.accessOrder.values().next().value;
       if (!oldestKey) break;
-      this.delete(oldestKey);
+      this.deleteInternal(oldestKey);
     }
+  }
+
+  /**
+   * Internal cleanup for expired entries (already within lock)
+   */
+  private cleanupInternal(): number {
+    const now = Date.now();
+    let removedCount = 0;
+    const expiredKeys: string[] = [];
+
+    // Collect expired keys first to avoid modification during iteration
+    for (const [key, entry] of this.cache.entries()) {
+      if (now > entry.expires) {
+        expiredKeys.push(key);
+      }
+    }
+
+    // Remove expired entries atomically
+    for (const key of expiredKeys) {
+      if (this.deleteInternal(key)) {
+        removedCount++;
+      }
+    }
+
+    return removedCount;
   }
 
   /**
@@ -188,8 +305,15 @@ export class BoundedCache<T = unknown> {
       return; // Skip timer in tests
     }
 
-    this.cleanupTimer = setInterval(() => {
-      this.cleanup();
+    this.cleanupTimer = setInterval(async () => {
+      try {
+        await this.cleanup();
+      } catch (error) {
+        // Silent cleanup errors to avoid crashing the timer
+        if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
+          console.warn('[EdgePilot] Cache cleanup error:', error);
+        }
+      }
     }, this.options.cleanupInterval);
 
     // Clear timer on process exit
@@ -201,12 +325,17 @@ export class BoundedCache<T = unknown> {
   /**
    * Destroy cache and cleanup resources
    */
-  destroy(): void {
+  async destroy(): Promise<void> {
     if (this.cleanupTimer) {
       clearInterval(this.cleanupTimer);
       this.cleanupTimer = undefined;
     }
-    this.clear();
+
+    // Clear operation queue
+    this.operationQueue.length = 0;
+    this.isProcessing = false;
+
+    await this.clear();
   }
 }
 

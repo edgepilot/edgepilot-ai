@@ -4,6 +4,7 @@ export interface ApiClientOptions {
   apiKey: string;
   accountId: string;
   debug?: boolean;
+  timeout?: number;
 }
 
 export interface CallOptions {
@@ -20,11 +21,13 @@ export class CloudflareApiClient {
   private apiKey: string;
   private accountId: string;
   private debug: boolean;
+  private timeout: number;
 
   constructor(options: ApiClientOptions) {
     this.apiKey = options.apiKey;
     this.accountId = options.accountId;
     this.debug = options.debug ?? false;
+    this.timeout = options.timeout ?? 30000; // 30 second default timeout
   }
 
   private getEndpoint(model: string): string {
@@ -69,17 +72,32 @@ export class CloudflareApiClient {
       ...(typeof options.temperature === 'number' ? { temperature: options.temperature } : {})
     };
 
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(body)
-    });
+    // Create abort controller for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
-    if (!response.ok) {
-      await this.handleError(response);
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(body),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        await this.handleError(response);
+      }
+
+      return response;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new HttpError(408, 'Request timeout', `Cloudflare API request timed out after ${this.timeout}ms`);
+      }
+      throw error;
     }
-
-    return response;
   }
 }
 
@@ -89,10 +107,12 @@ export class CloudflareApiClient {
 export class OpenAIApiClient {
   private apiKey: string;
   private debug: boolean;
+  private timeout: number;
 
-  constructor(apiKey: string, debug: boolean = false) {
+  constructor(apiKey: string, debug: boolean = false, timeout: number = 30000) {
     this.apiKey = apiKey;
     this.debug = debug;
+    this.timeout = timeout;
   }
 
   private getEndpoint(): string {
@@ -140,16 +160,31 @@ export class OpenAIApiClient {
       ...(typeof options.temperature === 'number' ? { temperature: options.temperature } : {})
     };
 
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(body)
-    });
+    // Create abort controller for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
-    if (!response.ok) {
-      await this.handleError(response);
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(body),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        await this.handleError(response);
+      }
+
+      return response;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new HttpError(408, 'Request timeout', `OpenAI API request timed out after ${this.timeout}ms`);
+      }
+      throw error;
     }
-
-    return response;
   }
 }

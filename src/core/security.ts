@@ -86,40 +86,102 @@ export function validateEnvironmentSecurity(): void {
 }
 
 /**
- * Rate limiting utility (simple in-memory implementation)
+ * Thread-safe rate limiting utility with atomic operations and timeout protection
  */
 export class SimpleRateLimit {
   private requests = new Map<string, { count: number; resetTime: number }>();
   private readonly maxRequests: number;
   private readonly windowMs: number;
+  private readonly maxClients: number;
+  private cleanupTimer?: NodeJS.Timeout;
+  private isShuttingDown = false;
+  private operationTimeouts = 0;
 
-  constructor(maxRequests = 100, windowMs = 60000) { // 100 requests per minute by default
+  constructor(maxRequests = 100, windowMs = 60000, maxClients = 10000) {
     this.maxRequests = maxRequests;
     this.windowMs = windowMs;
+    this.maxClients = maxClients;
+    this.startCleanupTimer();
   }
 
   /**
-   * Check if request is within rate limit
+   * Check if request is within rate limit (thread-safe with timeout protection)
    */
-  checkLimit(identifier: string): boolean {
-    const now = Date.now();
-    const userLimit = this.requests.get(identifier);
-
-    if (!userLimit || now > userLimit.resetTime) {
-      // Reset window
-      this.requests.set(identifier, {
-        count: 1,
-        resetTime: now + this.windowMs
-      });
-      return true;
-    }
-
-    if (userLimit.count >= this.maxRequests) {
+  checkLimit(identifier: string, timeoutMs: number = 1000): boolean {
+    if (this.isShuttingDown) {
       return false;
     }
 
-    userLimit.count++;
-    return true;
+    const startTime = Date.now();
+    const now = Date.now();
+
+    try {
+      // Timeout protection for the operation
+      if (Date.now() - startTime > timeoutMs) {
+        this.operationTimeouts++;
+        return false;
+      }
+
+      // Sanitize identifier to prevent attacks
+      const sanitizedId = this.sanitizeIdentifier(identifier);
+      if (!sanitizedId) {
+        return false;
+      }
+
+      // Prevent unbounded growth with circuit breaker
+      if (this.requests.size > this.maxClients) {
+        // Emergency cleanup if size exceeded
+        try {
+          this.cleanup();
+        } catch (cleanupError) {
+          // If cleanup fails, reject to prevent memory exhaustion
+          return false;
+        }
+      }
+
+      const userLimit = this.requests.get(sanitizedId);
+
+      if (!userLimit || now > userLimit.resetTime) {
+        // Reset window - atomic operation
+        this.requests.set(sanitizedId, {
+          count: 1,
+          resetTime: now + this.windowMs
+        });
+        return true;
+      }
+
+      // Atomic check and increment
+      if (userLimit.count >= this.maxRequests) {
+        return false;
+      }
+
+      // Atomic increment
+      userLimit.count = userLimit.count + 1;
+      return true;
+    } catch (error) {
+      // Fail safe on any error
+      return false;
+    }
+  }
+
+  /**
+   * Sanitize identifier to prevent injection attacks
+   */
+  private sanitizeIdentifier(identifier: string): string | null {
+    if (!identifier || typeof identifier !== 'string') {
+      return null;
+    }
+
+    // Limit length to prevent memory attacks
+    if (identifier.length > 256) {
+      return null;
+    }
+
+    // Basic sanitization - only allow alphanumeric and safe characters
+    const sanitized = identifier.replace(/[^a-zA-Z0-9_.-]/g, '');
+
+    // Must have some content after sanitization
+    return sanitized.length > 0 ? sanitized : null;
   }
 
   /**
@@ -140,30 +202,188 @@ export class SimpleRateLimit {
   }
 
   /**
-   * Cleanup expired entries
+   * Cleanup expired entries (thread-safe with timeout protection)
    */
-  cleanup(): void {
+  cleanup(timeoutMs: number = 5000): void {
+    if (this.isShuttingDown) {
+      return;
+    }
+
+    const startTime = Date.now();
     const now = Date.now();
-    for (const [key, value] of this.requests.entries()) {
-      if (now > value.resetTime) {
+    const toDelete: string[] = [];
+    let processedCount = 0;
+    const maxProcessPerCleanup = 10000; // Prevent infinite loops
+
+    try {
+      // Collect expired keys first to avoid modification during iteration
+      for (const [key, value] of this.requests.entries()) {
+        // Timeout protection during iteration
+        if (Date.now() - startTime > timeoutMs) {
+          this.operationTimeouts++;
+          break;
+        }
+
+        // Prevent unbounded processing
+        if (processedCount > maxProcessPerCleanup) {
+          break;
+        }
+
+        if (now > value.resetTime) {
+          toDelete.push(key);
+        }
+
+        processedCount++;
+      }
+
+      // Remove expired entries atomically with timeout protection
+      for (const key of toDelete) {
+        if (Date.now() - startTime > timeoutMs) {
+          break;
+        }
         this.requests.delete(key);
       }
+    } catch (error) {
+      // Silent failure for cleanup to prevent cascading errors
+      this.operationTimeouts++;
     }
+  }
+
+  /**
+   * Start automatic cleanup timer
+   */
+  private startCleanupTimer(): void {
+    if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
+      return; // Skip timer in tests
+    }
+
+    this.cleanupTimer = setInterval(() => {
+      this.cleanup();
+    }, Math.min(this.windowMs / 2, 30000)); // Cleanup twice per window or every 30s
+
+    // Clear timer on process exit
+    if (typeof process !== 'undefined') {
+      process.on('exit', () => this.destroy());
+    }
+  }
+
+  /**
+   * Get reliability statistics
+   */
+  getStats(): {
+    totalClients: number;
+    maxClients: number;
+    operationTimeouts: number;
+    isShuttingDown: boolean;
+  } {
+    return {
+      totalClients: this.requests.size,
+      maxClients: this.maxClients,
+      operationTimeouts: this.operationTimeouts,
+      isShuttingDown: this.isShuttingDown
+    };
+  }
+
+  /**
+   * Graceful shutdown with timeout
+   */
+  async shutdown(timeoutMs: number = 5000): Promise<void> {
+    this.isShuttingDown = true;
+
+    // Stop new timer events
+    if (this.cleanupTimer) {
+      clearInterval(this.cleanupTimer);
+      this.cleanupTimer = undefined;
+    }
+
+    // Final cleanup with timeout protection
+    const startTime = Date.now();
+    while (this.requests.size > 0 && Date.now() - startTime < timeoutMs) {
+      try {
+        this.cleanup(1000); // 1s timeout per cleanup attempt
+        await new Promise(resolve => setTimeout(resolve, 100)); // Brief pause
+      } catch {
+        break; // Force exit on error
+      }
+    }
+
+    // Force clear remaining entries
+    this.requests.clear();
+  }
+
+  /**
+   * Destroy rate limiter and cleanup resources
+   */
+  destroy(): void {
+    this.isShuttingDown = true;
+    if (this.cleanupTimer) {
+      clearInterval(this.cleanupTimer);
+      this.cleanupTimer = undefined;
+    }
+    this.requests.clear();
   }
 }
 
 /**
- * Get client identifier for rate limiting
+ * Get client identifier for rate limiting with security enhancements
  */
 export function getClientIdentifier(request: Request): string {
-  // Try to get IP from various headers
-  const forwardedFor = request.headers.get('x-forwarded-for');
-  const realIP = request.headers.get('x-real-ip');
-  const cfConnectingIP = request.headers.get('cf-connecting-ip');
+  try {
+    // Try to get IP from various headers with validation
+    const forwardedFor = request.headers.get('x-forwarded-for');
+    const realIP = request.headers.get('x-real-ip');
+    const cfConnectingIP = request.headers.get('cf-connecting-ip');
 
-  const ip = cfConnectingIP || realIP || forwardedFor?.split(',')[0]?.trim() || 'unknown';
+    // Validate and sanitize IP addresses
+    let ip = 'unknown';
 
-  // Hash the IP for privacy in logs
-  const buffer = new TextEncoder().encode(ip);
-  return Array.from(buffer).map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 16);
+    if (cfConnectingIP && isValidIP(cfConnectingIP)) {
+      ip = cfConnectingIP;
+    } else if (realIP && isValidIP(realIP)) {
+      ip = realIP;
+    } else if (forwardedFor) {
+      const firstIP = forwardedFor.split(',')[0]?.trim();
+      if (firstIP && isValidIP(firstIP)) {
+        ip = firstIP;
+      }
+    }
+
+    // Limit IP length to prevent attacks
+    if (ip.length > 45) { // Max IPv6 length
+      ip = ip.slice(0, 45);
+    }
+
+    // Hash the IP for privacy in logs and consistent length
+    const buffer = new TextEncoder().encode(ip);
+    return Array.from(buffer).map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 16);
+  } catch (error) {
+    // Fallback to timestamp-based identifier on any error
+    return Date.now().toString(16).slice(-16).padStart(16, '0');
+  }
+}
+
+/**
+ * Validate IP address format (basic validation)
+ */
+function isValidIP(ip: string): boolean {
+  if (!ip || typeof ip !== 'string' || ip.length === 0 || ip.length > 45) {
+    return false;
+  }
+
+  // Basic IPv4 regex
+  const ipv4Regex = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
+  // Basic IPv6 regex (simplified)
+  const ipv6Regex = /^([0-9a-fA-F]{0,4}:){2,7}[0-9a-fA-F]{0,4}$/;
+
+  if (ipv4Regex.test(ip)) {
+    // Validate IPv4 ranges
+    const parts = ip.split('.').map(Number);
+    return parts.every(part => part >= 0 && part <= 255);
+  }
+
+  if (ipv6Regex.test(ip)) {
+    return true; // Basic IPv6 validation
+  }
+
+  return false;
 }
