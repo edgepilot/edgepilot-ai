@@ -1,4 +1,4 @@
-import { Role, Message, Config } from './core/types';
+import { Role, Message, Config, HttpError } from './core/types';
 
 export function createFetchHandler(config: Config) {
   const apiKey = config?.apiKey || process.env.CLOUDFLARE_API_TOKEN || '';
@@ -9,16 +9,16 @@ export function createFetchHandler(config: Config) {
   const openaiModel = process.env.OPENAI_MODEL || 'gpt-4o-mini';
   const endpoint = `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/v1/chat/completions`;
 
-  if (!apiKey) throw new Error('apiKey is required');
-  if (!accountId) throw new Error('accountId is required');
+  if (!apiKey) throw new HttpError(401, 'Unauthorized', 'API key is required');
+  if (!accountId) throw new HttpError(401, 'Unauthorized', 'Account ID is required');
 
   function validateMessages(messages: any): Message[] {
     if (!Array.isArray(messages) || messages.length === 0) {
-      throw new Error('Messages must be a non-empty array');
+      throw new HttpError(400, 'Invalid request', 'Messages must be a non-empty array');
     }
     return messages.map((msg: any, index: number) => {
       if (!msg?.role || !msg?.content) {
-        throw new Error(`Invalid message at index ${index}`);
+        throw new HttpError(400, 'Invalid request', `Invalid message at index ${index}`);
       }
       return { role: String(msg.role), content: String(msg.content).slice(0, 10_000) };
     });
@@ -26,7 +26,7 @@ export function createFetchHandler(config: Config) {
 
   function extractMessages(body: any): Message[] {
     if (!body || typeof body !== 'object') {
-      throw new Error('Invalid request body');
+      throw new HttpError(400, 'Invalid request', 'Invalid request body');
     }
     if (Array.isArray(body.messages)) {
       return validateMessages(body.messages);
@@ -34,7 +34,7 @@ export function createFetchHandler(config: Config) {
     if (body.query && body.variables?.messages) {
       return validateMessages(body.variables.messages);
     }
-    throw new Error('No messages found in request');
+    throw new HttpError(400, 'Invalid request', 'No messages found in request');
   }
 
   function transformResponse(cfResponse: any, streaming: boolean, effectiveModel: string) {
@@ -122,15 +122,16 @@ export function createFetchHandler(config: Config) {
         headers: { 'Content-Type': 'application/json' }
       });
     } catch (error: any) {
-      if (error?.message?.includes('Invalid request body') ||
-          error?.message?.includes('No messages found') ||
-          error?.message?.includes('Invalid message')) {
-        return new Response(JSON.stringify({ error: error.message }), {
-          status: 400,
+      if (error instanceof HttpError) {
+        return new Response(JSON.stringify({ error: error.publicMessage }), {
+          status: error.status,
           headers: { 'Content-Type': 'application/json' }
         });
       }
-      return new Response('Internal server error', { status: 500 });
+      return new Response(JSON.stringify({ error: 'Internal server error' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
   };
 }

@@ -1,4 +1,4 @@
-import { Config } from './types';
+import { Config, HttpError } from './types';
 
 /**
  * Default configuration values
@@ -31,10 +31,10 @@ export function resolveConfig(userConfig: Config = {}): Required<Config> {
  */
 export function validateConfig(config: Required<Config>): void {
   if (!config.apiKey) {
-    throw new Error('API key required: set CLOUDFLARE_API_TOKEN environment variable or pass apiKey in config');
+    throw new HttpError(401, 'Unauthorized', 'API key required: set CLOUDFLARE_API_TOKEN environment variable or pass apiKey in config');
   }
   if (!config.accountId) {
-    throw new Error('Account ID required: set CLOUDFLARE_ACCOUNT_ID environment variable or pass accountId in config');
+    throw new HttpError(401, 'Unauthorized', 'Account ID required: set CLOUDFLARE_ACCOUNT_ID environment variable or pass accountId in config');
   }
 }
 

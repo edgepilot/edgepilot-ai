@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { Role, Message, Config, HttpError } from './core/types';
+import { validateRequestBody } from './core/validation';
+import { secureLog, SimpleRateLimit, getClientIdentifier, validateEnvironmentSecurity } from './core/security';
 
 class SimpleCache<T = unknown> {
   private cache = new Map<string, { data: T; expires: number }>();
@@ -31,8 +33,12 @@ export function createNextHandler(userConfig: Config = {}) {
   const openaiKey = process.env.OPENAI_API_KEY || '';
   const openaiModel = process.env.OPENAI_MODEL || 'gpt-4o-mini';
 
-  if (!apiKey) throw new Error('API key required');
-  if (!accountId) throw new Error('Account ID required');
+  // Initialize security features
+  const rateLimit = new SimpleRateLimit(100, 60000); // 100 requests per minute
+  validateEnvironmentSecurity();
+
+  if (!apiKey) throw new HttpError(401, 'Unauthorized', 'API key required');
+  if (!accountId) throw new HttpError(401, 'Unauthorized', 'Account ID required');
 
   function validateMessages(messages: any): Message[] {
     if (!Array.isArray(messages) || messages.length === 0) {
@@ -274,26 +280,53 @@ export function createNextHandler(userConfig: Config = {}) {
     return result;
   }
 
-  async function handleRequest(body: any) {
-    const messages = extractMessages(body);
-    if (!messages || messages.length === 0) {
-      throw new HttpError(400, 'Invalid request', 'No messages provided');
-    }
-    const useStreaming = body.stream === true || (body.stream !== false && defaultStream);
-    const selectedModel = typeof body?.model === 'string' && body.model.trim() ? String(body.model).trim() : undefined;
-    const providerOverride = typeof body?.provider === 'string' ? String(body.provider).toLowerCase() : undefined;
-    const temperature = typeof body?.temperature === 'number' ? Number(body.temperature) : undefined;
+  async function handleRequest(validatedRequest: {
+    messages: Message[];
+    stream?: boolean;
+    model?: string;
+    temperature?: number;
+    provider?: string;
+  }) {
+    const { messages, stream, model: selectedModel, temperature, provider: providerOverride } = validatedRequest;
+    const useStreaming = stream === true || (stream !== false && defaultStream);
     return useStreaming ? handleStreaming(messages, selectedModel, providerOverride, temperature) : handleNormal(messages, selectedModel, providerOverride, temperature);
   }
 
   return async function POST(req: Request): Promise<Response> {
     try {
+      // Rate limiting check
+      const clientId = getClientIdentifier(req);
+      if (!rateLimit.checkLimit(clientId)) {
+        const status = rateLimit.getStatus(clientId);
+        return NextResponse.json(
+          { error: 'Rate limit exceeded' },
+          {
+            status: 429,
+            headers: {
+              'X-RateLimit-Limit': '100',
+              'X-RateLimit-Remaining': status.remaining.toString(),
+              'X-RateLimit-Reset': new Date(status.resetTime).toISOString()
+            }
+          }
+        );
+      }
+
       const body = await req.json();
-      const result = await handleRequest(body);
+
+      // Secure validation and sanitization
+      const validatedRequest = validateRequestBody(body);
+
+      if (debug) {
+        secureLog(`Processing request with ${validatedRequest.messages.length} messages`);
+      }
+
+      const result = await handleRequest(validatedRequest);
       if (result instanceof Response) return result;
       return NextResponse.json(result);
     } catch (error: any) {
-      if (debug) console.error('[EdgePilot] Error:', error);
+      if (debug) {
+        secureLog('Request error:', error.message);
+      }
       if (error instanceof HttpError) {
         return NextResponse.json({ error: error.publicMessage }, { status: error.status });
       }

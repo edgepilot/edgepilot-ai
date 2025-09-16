@@ -1,4 +1,5 @@
 import type { ChatRequest } from "./types";
+import { HttpError } from "./types";
 
 export interface ProviderDriver {
   name: string;
@@ -13,6 +14,6 @@ export function registerDriver(driver: ProviderDriver) {
 
 export function getDriver(name: string): ProviderDriver {
   const d = registry.get(name);
-  if (!d) throw new Error(`Provider "${name}" not registered`);
+  if (!d) throw new HttpError(404, 'Provider not found', `Provider "${name}" not registered`);
   return d;
 }
