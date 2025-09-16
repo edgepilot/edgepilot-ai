@@ -9,7 +9,7 @@ A Next.js application demonstrating EdgePilot's AI assistant capabilities powere
 pnpm install
 
 # Set up environment variables
-cp .env.example .env.local
+cp .env.local.example .env.local
 # Add your Cloudflare credentials to .env.local
 
 # Run development server

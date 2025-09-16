@@ -13,7 +13,7 @@ Backend API handlers for Cloudflare Workers AI integration in Next.js and Edge R
 
 EdgePilot provides backend API handlers that connect your Next.js app to Cloudflare Workers AI, enabling:
 - **Zero cold-start AI inference** at the edge
-- **90% lower costs** compared to OpenAI
+- **Significantly lower costs** with Cloudflare's edge pricing model
 - **Global edge deployment** on Cloudflare's network
 
 ## Why Backend-Only?
@@ -52,6 +52,12 @@ yarn add edgepilot-ai
 This package provides the **backend API handlers**. For a complete example with UI components, see our [starter example](https://github.com/edgepilot/edgepilot-ai/tree/main/examples/starter).
 
 ### 1. Set up environment variables
+
+First, get your Cloudflare credentials:
+1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com/) → **My Profile** → **API Tokens**
+2. Click **Create Token** → Use **Custom token** template
+3. Add permission: **Account** → **Cloudflare Workers AI** → **Edit**
+4. Copy your token and account ID
 
 Create a `.env.local` file:
 
@@ -125,12 +131,42 @@ See [all available models](https://developers.cloudflare.com/workers-ai/models/)
 Creates a Next.js API route handler for AI chat endpoints.
 
 ```typescript
+import { createNextHandler } from 'edgepilot-ai/next';
+import type { Config } from 'edgepilot-ai';
+
 const handler = createNextHandler({
   model: '@cf/meta/llama-3.1-8b-instruct', // AI model to use
   stream: true,                             // Enable streaming
   cache: false,                             // Response caching
   debug: false,                             // Debug logging
 });
+```
+
+### TypeScript Usage
+
+EdgePilot is fully typed. Import types for better IDE support:
+
+```typescript
+import type {
+  Config,
+  Message,
+  HttpError,
+  StreamingOptions
+} from 'edgepilot-ai';
+
+// Type-safe configuration
+const config: Config = {
+  model: '@cf/meta/llama-3.1-8b-instruct',
+  stream: true,
+  cache: false,
+  debug: process.env.NODE_ENV === 'development'
+};
+
+// Type-safe message handling
+const messages: Message[] = [
+  { role: 'system', content: 'You are a helpful assistant' },
+  { role: 'user', content: 'Hello!' }
+];
 ```
 
 ### Options

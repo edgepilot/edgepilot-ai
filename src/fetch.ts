@@ -1,5 +1,41 @@
 import { Role, Message, Config, HttpError } from './core/types';
 
+/**
+ * Creates a fetch-compatible handler for EdgePilot AI that works with Cloudflare Workers
+ * and other edge runtimes. This handler processes AI chat requests and returns responses
+ * from either Cloudflare Workers AI or OpenAI based on configuration.
+ *
+ * @param config - Configuration options for the handler
+ * @param config.apiKey - Cloudflare API token (defaults to CLOUDFLARE_API_TOKEN env var)
+ * @param config.accountId - Cloudflare account ID (defaults to CLOUDFLARE_ACCOUNT_ID env var)
+ * @param config.model - Default AI model to use (defaults to @cf/meta/llama-3.1-8b-instruct)
+ *
+ * @returns A fetch handler function that processes AI requests
+ *
+ * @example
+ * ```typescript
+ * // Basic usage with Cloudflare Workers
+ * import { createFetchHandler } from 'edgepilot-ai/fetch';
+ *
+ * const handler = createFetchHandler({
+ *   model: '@cf/meta/llama-3.1-8b-instruct'
+ * });
+ *
+ * export default {
+ *   fetch: handler
+ * };
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // With explicit configuration
+ * const handler = createFetchHandler({
+ *   apiKey: 'your-api-token',
+ *   accountId: 'your-account-id',
+ *   model: '@cf/mistral/mistral-7b-instruct-v0.2'
+ * });
+ * ```
+ */
 export function createFetchHandler(config: Config) {
   const apiKey = config?.apiKey || process.env.CLOUDFLARE_API_TOKEN || '';
   const accountId = config?.accountId || process.env.CLOUDFLARE_ACCOUNT_ID || '';
