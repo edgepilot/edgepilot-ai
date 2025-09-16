@@ -81,7 +81,49 @@ export function validateMessages(messages: unknown): Message[] {
 }
 
 /**
- * Validates model name
+ * Allowed Cloudflare Workers AI models
+ */
+export const ALLOWED_MODELS = [
+  // Meta Llama Models
+  '@cf/meta/llama-3.3-70b-instruct',
+  '@cf/meta/llama-3.2-11b-vision-instruct',
+  '@cf/meta/llama-3.2-3b-instruct',
+  '@cf/meta/llama-3.2-1b-instruct',
+  '@cf/meta/llama-3.1-70b-instruct',
+  '@cf/meta/llama-3.1-8b-instruct',
+  '@cf/meta/llama-3-8b-instruct',
+  '@cf/meta/llama-2-7b-chat-fp16',
+
+  // Mistral Models
+  '@cf/mistral/mistral-7b-instruct-v0.2',
+  '@cf/mistral/mistral-7b-instruct-v0.1',
+
+  // Microsoft Phi Models
+  '@cf/microsoft/phi-2',
+
+  // Qwen Models
+  '@cf/qwen/qwen1.5-0.5b-chat',
+  '@cf/qwen/qwen1.5-1.8b-chat',
+  '@cf/qwen/qwen1.5-7b-chat-awq',
+  '@cf/qwen/qwen1.5-14b-chat-awq',
+
+  // Other Models
+  '@cf/tinyllama/tinyllama-1.1b-chat-v1.0',
+  '@cf/deepseek-ai/deepseek-math-7b-instruct',
+  '@cf/thebloke/deepseek-coder-6.7b-instruct-awq',
+  '@cf/openchat/openchat-3.5-0106',
+
+  // OpenAI Models (for OpenAI provider)
+  'gpt-4-turbo-preview',
+  'gpt-4',
+  'gpt-3.5-turbo',
+  'gpt-3.5-turbo-16k'
+] as const;
+
+export type AllowedModel = typeof ALLOWED_MODELS[number];
+
+/**
+ * Validates model name against allowlist
  */
 export function validateModelName(model: unknown): string | undefined {
   if (model === undefined || model === null) {
@@ -94,9 +136,13 @@ export function validateModelName(model: unknown): string | undefined {
 
   const sanitized = sanitizeString(model, SECURITY_LIMITS.MAX_MODEL_NAME_LENGTH);
 
-  // Basic model name validation - should start with @ for Cloudflare models
-  if (sanitized.length > 0 && !sanitized.match(/^[@a-zA-Z0-9\/_\-\.]+$/)) {
-    throw new HttpError(400, 'Invalid request', 'Invalid model name format');
+  // Check against allowlist for security
+  if (sanitized.length > 0 && !ALLOWED_MODELS.includes(sanitized as AllowedModel)) {
+    throw new HttpError(
+      400,
+      'Invalid request',
+      `Model '${sanitized}' is not in the allowed models list. Available models: ${ALLOWED_MODELS.filter(m => m.startsWith('@cf/')).slice(0, 5).join(', ')}, ...`
+    );
   }
 
   return sanitized;

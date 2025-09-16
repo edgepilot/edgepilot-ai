@@ -353,9 +353,15 @@ export function getClientIdentifier(request: Request): string {
       ip = ip.slice(0, 45);
     }
 
-    // Hash the IP for privacy in logs and consistent length
-    const buffer = new TextEncoder().encode(ip);
-    return Array.from(buffer).map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 16);
+    // Use simple hash for privacy (crypto.subtle not available in all edge environments)
+    let hash = 0;
+    const str = ip + '-edgepilot-salt';
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    return Math.abs(hash).toString(16).padStart(16, '0').slice(0, 16);
   } catch (error) {
     // Fallback to timestamp-based identifier on any error
     return Date.now().toString(16).slice(-16).padStart(16, '0');

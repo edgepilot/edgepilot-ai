@@ -48,7 +48,12 @@ export class CloudflareApiClient {
     try {
       const errTxt = await response.text();
       if (this.debug) {
-        console.error('[EdgePilot] Cloudflare API error:', status, errTxt?.slice(0, 500));
+        // Sanitize error text to prevent exposing sensitive information
+        const sanitizedError = errTxt
+          ?.replace(/[a-f0-9]{32}/gi, 'REDACTED_ID') // Redact account IDs
+          ?.replace(/Bearer\s+[^\s]+/gi, 'Bearer REDACTED_TOKEN') // Redact bearer tokens
+          ?.slice(0, 200);
+        console.error('[EdgePilot] Cloudflare API error:', status, sanitizedError);
       }
     } catch {}
 
@@ -132,7 +137,12 @@ export class OpenAIApiClient {
     try {
       const txt = await response.text();
       if (this.debug) {
-        console.error('[EdgePilot] OpenAI error:', status, txt?.slice(0, 500));
+        // Sanitize error text to prevent exposing sensitive information
+        const sanitizedError = txt
+          ?.replace(/sk-[a-zA-Z0-9]+/g, 'sk-REDACTED') // Redact API keys
+          ?.replace(/Bearer\s+[^\s]+/gi, 'Bearer REDACTED_TOKEN') // Redact bearer tokens
+          ?.slice(0, 200);
+        console.error('[EdgePilot] OpenAI error:', status, sanitizedError);
       }
     } catch {}
 

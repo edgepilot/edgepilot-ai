@@ -75,7 +75,7 @@ export class BoundedCache<T = unknown> {
   }
 
   /**
-   * Process queued operations sequentially
+   * Process queued operations sequentially with batching
    */
   private processQueue(): void {
     if (this.isProcessing || this.operationQueue.length === 0) {
@@ -84,24 +84,34 @@ export class BoundedCache<T = unknown> {
 
     this.isProcessing = true;
 
-    // Process in next tick to avoid blocking
-    process.nextTick(() => {
-      const operation = this.operationQueue.shift();
-      if (operation) {
-        operation();
+    // Use setImmediate for fairer scheduling and batch processing
+    setImmediate(() => {
+      const BATCH_SIZE = 10;
+      let processed = 0;
+
+      // Process up to BATCH_SIZE operations
+      while (this.operationQueue.length > 0 && processed < BATCH_SIZE) {
+        const operation = this.operationQueue.shift();
+        if (operation) {
+          operation();
+        }
+        processed++;
       }
 
       this.isProcessing = false;
 
-      // Process next operation if any
+      // Continue processing if more operations remain
       if (this.operationQueue.length > 0) {
-        this.processQueue();
+        // Yield to event loop before next batch
+        setImmediate(() => this.processQueue());
       }
     });
   }
 
   /**
-   * Get an item from cache (thread-safe)
+   * Get an item from cache (eventually consistent)
+   * Note: This is synchronous for performance but may return stale data during concurrent writes.
+   * For strict consistency, await set() operations before calling get().
    */
   get(key: string): T | null {
     const entry = this.cache.get(key);
