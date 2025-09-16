@@ -1,0 +1,89 @@
+name: Publish to NPM
+
+on:
+  release:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (e.g., 0.1.0)'
+        required: true
+        type: string
+      tag:
+        description: 'NPM tag (latest, beta, next)'
+        required: false
+        default: 'latest'
+        type: choice
+        options:
+          - latest
+          - beta
+          - next
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write  # For npm provenance
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: pnpm/action-setup@v3
+      with:
+        version: 9
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        registry-url: 'https://registry.npmjs.org'
+        cache: 'pnpm'
+
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+
+    - name: Run tests
+      run: pnpm run test
+
+    - name: Build package
+      run: pnpm run build
+
+    - name: Validate package
+      run: |
+        npm pack --dry-run
+        echo "Package contents:"
+        npm pack --dry-run 2>/dev/null | grep "npm notice"
+
+    - name: Set version (manual trigger)
+      if: github.event_name == 'workflow_dispatch'
+      run: npm version ${{ inputs.version }} --no-git-tag-version
+
+    - name: Publish to NPM
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          npm publish --tag ${{ inputs.tag }} --provenance --access public
+        else
+          npm publish --provenance --access public
+        fi
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+    - name: Create GitHub Release (manual trigger)
+      if: github.event_name == 'workflow_dispatch'
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ inputs.version }}
+        release_name: Release v${{ inputs.version }}
+        body: |
+          ## Changes in v${{ inputs.version }}
+
+          See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for details.
+
+          ## Installation
+          ```bash
+          npm install edgepilot-ai@${{ inputs.version }}
+          ```
+        draft: false
+        prerelease: ${{ inputs.tag != 'latest' }}

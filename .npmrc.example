@@ -1,0 +1,17 @@
+# EdgePilot AI NPM Configuration
+# Copy this to .npmrc and add your auth token for publishing
+
+# Registry configuration
+registry=https://registry.npmjs.org/
+@edgepilot:registry=https://registry.npmjs.org/
+
+# Package settings
+package-lock=false  # We use pnpm
+save-exact=false
+engine-strict=true
+
+# Publishing configuration
+access=public
+
+# Auth token (add this line with your actual token for publishing)
+# //registry.npmjs.org/:_authToken=${NPM_TOKEN}
